@@ -13,13 +13,17 @@ export const KBS = [
   "KB-030",
 ] as const;
 
-export function responder(req: ChatRequest, ctx: Contexto) {
-  return rodarAgente({
+export async function responder(req: ChatRequest, ctx: Contexto) {
+  let ui: string | null = null;
+  const resposta = await rodarAgente({
     motivo: "onde_esta_meu_dinheiro",
     skill: lerDoRepo("packages/motivos/src/onde_esta_meu_dinheiro/skills/liquidacao.md"),
     kbs: KBS,
-    tools: criarTools(ctx),
+    tools: criarTools(ctx, req.momento, (u) => {
+      ui = u;
+    }),
     req,
     modelo: ctx.modelo,
   });
+  return { ...resposta, ui };
 }
