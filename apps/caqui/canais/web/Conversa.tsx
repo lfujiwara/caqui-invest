@@ -1,7 +1,7 @@
 "use client";
 
 import type { Enviar, Mensagem, Resposta } from "@caqui/nucleo";
-import { Fragment, type ReactNode, useState } from "react";
+import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import {
   AvisoHorario,
   BotaoHumano,
@@ -45,26 +45,43 @@ function rolarAte(ultimo: HTMLLIElement | null) {
 export function Conversa({
   enviar,
   idCliente,
+  roteiro = [],
+  momentoFixo,
   children: marca,
 }: {
   enviar: Enviar;
   idCliente: string | null;
+  /** Mensagens enviadas sozinhas, uma por vez, assim que a anterior é respondida. */
+  roteiro?: readonly string[];
+  /** Momento de um caso da demo; quando vem, substitui o seletor de momento. */
+  momentoFixo?: string;
   children: ReactNode;
 }) {
   const [trocas, setTrocas] = useState<Troca[]>([]);
   const [pendente, setPendente] = useState<Pendente>(null);
   const [simulado, setSimulado] = useState<MomentoSimulado>("real");
   const enviando = pendente !== null && !pendente.falhou;
+  const agora = () => momentoFixo ?? momentoDe(simulado);
+
+  // Ref, e não estado: no StrictMode o efeito roda duas vezes e mandaria a mesma mensagem duas vezes.
+  const enviadasDoRoteiro = useRef(0);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: só avança quando uma troca termina.
+  useEffect(() => {
+    const proxima = roteiro[trocas.length];
+    if (pendente || proxima === undefined || enviadasDoRoteiro.current > trocas.length) return;
+    enviadasDoRoteiro.current = trocas.length + 1;
+    enviarTexto(proxima);
+  }, [trocas.length, pendente]);
 
   async function enviarTexto(texto: string) {
     const mensagem = texto.trim();
     if (!mensagem || enviando) return;
-    const momento = momentoDe(simulado);
+    const momento = agora();
     setPendente({ texto: mensagem, falhou: false });
     try {
       const historico = paraHistorico(trocas);
       const resposta = await enviar({ canal: "web", mensagem, historico, idCliente, momento });
-      const respostaEm = momentoDe(simulado);
+      const respostaEm = agora();
       const kbs = resposta.fontes.flatMap((f) => (f.tipo === "kb" ? [`${f.id} ${f.titulo}`] : []));
       if (kbs.length) console.info("[caqui/web] fontes da KB", kbs);
       setTrocas((ts) => [
@@ -78,7 +95,7 @@ export function Conversa({
     }
   }
 
-  const disponivel = humanoNoHorario(momentoDe(simulado));
+  const disponivel = humanoNoHorario(agora());
   const vazia = trocas.length === 0 && pendente === null;
 
   return (
@@ -135,7 +152,7 @@ export function Conversa({
 
       <footer className={css.rodape}>
         <Composer desabilitado={enviando} aoEnviar={enviarTexto} />
-        <SeletorMomento valor={simulado} aoMudar={setSimulado} />
+        {!momentoFixo && <SeletorMomento valor={simulado} aoMudar={setSimulado} />}
       </footer>
     </div>
   );

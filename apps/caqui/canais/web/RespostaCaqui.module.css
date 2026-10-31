@@ -93,7 +93,7 @@
   gap: 2px;
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .ficha div {
     grid-template-columns: 7rem 1fr;
     align-items: center;
@@ -375,7 +375,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@container (max-width: 480px) {
   .resposta[data-seguranca],
   .handoff {
     padding: var(--cq-e-4);

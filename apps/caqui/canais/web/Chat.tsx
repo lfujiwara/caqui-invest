@@ -17,10 +17,20 @@ const mono = JetBrains_Mono({
 });
 
 /** Canal web da Caqui Invest. `enviar` é a server action que fala com o núcleo. */
-export function Chat({ enviar, idCliente = null }: { enviar: Enviar; idCliente?: string | null }) {
+export function Chat({
+  enviar,
+  idCliente = null,
+  roteiro,
+  momentoFixo,
+}: {
+  enviar: Enviar;
+  idCliente?: string | null;
+  roteiro?: readonly string[];
+  momentoFixo?: string;
+}) {
   return (
     <div className={`${tokens.tema} ${sans.variable} ${serifa.variable} ${mono.variable}`}>
-      <Conversa enviar={enviar} idCliente={idCliente}>
+      <Conversa enviar={enviar} idCliente={idCliente} roteiro={roteiro} momentoFixo={momentoFixo}>
         <Marca />
       </Conversa>
     </div>

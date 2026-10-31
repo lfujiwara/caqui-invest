@@ -111,7 +111,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@container (max-width: 480px) {
   .topo {
     padding: var(--cq-e-2) var(--cq-e-3);
   }
@@ -141,7 +141,7 @@
   }
 }
 
-@media (min-width: 900px) {
+@container (min-width: 900px) {
   .topo {
     padding: var(--cq-e-4) max(var(--cq-e-4), calc((100% - 760px) / 2));
   }

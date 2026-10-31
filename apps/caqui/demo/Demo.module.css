@@ -1,0 +1,241 @@
+/* Palco da demo. Visual neutro e escuro, como a faixa do SeletorCliente, para não parecer produto. */
+.palco {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) auto minmax(260px, 380px);
+  justify-content: center;
+  gap: 32px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: #1e1f24;
+  color: #e8e9ec;
+  font:
+    14px / 1.4 system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+.painel {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  position: sticky;
+  top: 24px;
+}
+
+.titulo {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #b9bbc2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selo {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #f5c84c;
+  color: #1e1f24;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.pessoa {
+  width: 100%;
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  text-align: left;
+  border: 1px solid #3a3c44;
+  border-radius: 8px;
+  background: #26282e;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pessoa:hover {
+  border-color: #6b6e78;
+}
+
+.pessoa[aria-pressed="true"] {
+  border-color: #f5c84c;
+  background: #2f2c22;
+}
+
+.nome {
+  font-weight: 600;
+}
+
+.detalhe {
+  font-size: 12px;
+  color: #9a9ca5;
+}
+
+.outro {
+  display: grid;
+  gap: 4px;
+  color: #b9bbc2;
+  font-size: 12px;
+}
+
+.outro select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #3a3c44;
+  background: #26282e;
+  color: inherit;
+  font: inherit;
+}
+
+.centro {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 12px;
+}
+
+.legenda {
+  margin: 0;
+  color: #b9bbc2;
+  font-size: 13px;
+}
+
+.celular {
+  width: 390px;
+  height: min(820px, calc(100dvh - 120px));
+  padding: 12px;
+  border-radius: 48px;
+  background: #0b0b0d;
+  box-shadow:
+    0 0 0 2px #3a3c44,
+    0 30px 60px rgb(0 0 0 / 0.5);
+  box-sizing: border-box;
+}
+
+.tela {
+  height: 100%;
+  overflow-y: auto;
+  border-radius: 36px;
+  background: #fffaeb;
+}
+
+/* O chat ocupa a viewport inteira na página principal; aqui, só a tela do celular. */
+.tela > * > * {
+  min-height: 100%;
+}
+
+.limpar,
+.simular {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #55575f;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.limpar:hover,
+.simular:hover {
+  border-color: #f5c84c;
+}
+
+.caso {
+  border: 1px solid #3a3c44;
+  border-radius: 8px;
+  background: #26282e;
+}
+
+.caso[open] {
+  border-color: #6b6e78;
+}
+
+.caso summary {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.etiqueta {
+  justify-self: start;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #3a3c44;
+  font-size: 11px;
+  color: #d5d7dc;
+}
+
+.pergunta {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.caso[open] .pergunta {
+  display: block;
+}
+
+.ficha {
+  margin: 0;
+  padding: 0 12px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  font-size: 13px;
+}
+
+.ficha dt {
+  color: #9a9ca5;
+}
+
+.ficha dd {
+  margin: 0;
+}
+
+.simular {
+  margin: 10px 12px 12px;
+  background: #f5c84c;
+  border-color: #f5c84c;
+  color: #1e1f24;
+  font-weight: 600;
+}
+
+@media (max-width: 1100px) {
+  .palco {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .painel {
+    position: static;
+    max-height: none;
+  }
+
+  .centro {
+    order: -1;
+  }
+
+  .celular {
+    width: 100%;
+    max-width: 390px;
+  }
+}

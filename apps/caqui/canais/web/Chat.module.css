@@ -44,7 +44,7 @@
   font-weight: 400;
 }
 
-@media (max-width: 400px) {
+@container (max-width: 400px) {
   .invest {
     display: none;
   }

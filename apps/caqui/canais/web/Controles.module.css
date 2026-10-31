@@ -151,7 +151,7 @@
   gap: var(--cq-e-3);
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .sugestoes {
     grid-template-columns: 1fr 1fr;
   }
@@ -406,7 +406,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 480px) {
+@container (max-width: 480px) {
   .humano {
     padding: 0 var(--cq-e-4);
   }

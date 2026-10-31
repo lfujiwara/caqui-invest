@@ -9,6 +9,9 @@
  */
 
 .tema {
+  /* Container das queries de largura: o chat se ajusta a onde está, como o celular da /demo. */
+  container-type: inline-size;
+
   /* Paleta da Mistral (getdesign.md/mistral.ai). A ação usa o laranja profundo
      #cc3a05: branco sobre o #fa520f da marca fica em 3,4:1, abaixo do mínimo. */
   --cq-caqui: #cc3a05;

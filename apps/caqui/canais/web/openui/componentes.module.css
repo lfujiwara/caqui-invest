@@ -11,7 +11,7 @@
   color: var(--cq-texto);
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .cartao {
     padding: var(--cq-e-6);
   }
@@ -145,7 +145,7 @@
   gap: var(--cq-e-5);
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .comparados {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
@@ -231,7 +231,7 @@
   gap: 2px;
 }
 
-@media (min-width: 640px) {
+@container (min-width: 640px) {
   .ficha div {
     grid-template-columns: 7rem 1fr;
     align-items: center;
