@@ -1,5 +1,5 @@
 import { tool } from "ai";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { rodarAgente } from "./agente";
 import { encaminhar } from "./atendimento";
@@ -70,6 +70,19 @@ describe("atender", () => {
   it("roteia pelo gatilho e chama a fatia", async () => {
     const { resposta } = await atenderComTrace(req("o que é CDI?"));
     expect(resposta.motivo).toBe("duvida_produto");
+  });
+
+  it("provedor do roteador indisponível: cai nos gatilhos e registra o erro", async () => {
+    vi.stubEnv("CAQUI_MODELO_ROTEADOR", "openrouter:nvidia/nemotron-3.5-super-vl:free");
+    vi.stubEnv("OPENROUTER_API_KEY", "");
+    try {
+      const { resposta, trace } = await atenderComTrace(req("o que é CDI?"));
+      expect(resposta.motivo).toBe("duvida_produto");
+      expect(trace?.guardrails).toEqual(["roteador_por_gatilhos"]);
+      expect(trace?.erro).toContain("OPENROUTER_API_KEY");
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("regra 5: golpe no meio de outra pergunta vai para segurança antes do roteador", async () => {

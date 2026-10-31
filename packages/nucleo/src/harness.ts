@@ -96,7 +96,14 @@ export async function atender(
       });
     }
     const vulneravel = detectarVulneravel(req.mensagem, cliente);
-    const rota = await rotear(req.mensagem, motivos, modeloDoRoteador());
+    const rota = await (async () => rotear(req.mensagem, motivos, modeloDoRoteador()))().catch(
+      (e: unknown) => {
+        // Provedor fora ou com limite de uso (comum em modelo gratuito): o cliente segue atendido.
+        erro = e instanceof Error ? e.message : String(e);
+        guardrails.push("roteador_por_gatilhos");
+        return rotear(req.mensagem, motivos, { tipo: "gatilhos" });
+      },
+    );
     if (vulneravel) {
       guardrails.push("cliente_vulneravel");
       return encaminhar({
