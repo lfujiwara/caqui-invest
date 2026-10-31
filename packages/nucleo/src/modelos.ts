@@ -1,27 +1,31 @@
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import type { LanguageModel } from "ai";
+import { defaultSettingsMiddleware, type LanguageModel, wrapLanguageModel } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { type SaidaAgente, TOOL_DA_RESPOSTA } from "./agente";
 import { buscarKb } from "./kb";
 
 /**
  * Único ponto que resolve modelos. Valores de CAQUI_MODELO_ROTEADOR e CAQUI_MODELO_MOTIVO:
- * `offline` (padrão, sem rede), `ollama:<modelo>` ou `openrouter:<provedor>/<modelo>`.
+ * `offline` (padrão, sem rede), `ollama:<modelo>`, `openrouter:<provedor>/<modelo>` ou
+ * `anthropic:<modelo>`.
  */
 export type Modo =
   | { tipo: "offline" }
   | { tipo: "ollama"; modelo: string }
-  | { tipo: "openrouter"; modelo: string };
+  | { tipo: "openrouter"; modelo: string }
+  | { tipo: "anthropic"; modelo: string };
 
 export function lerModo(valor: string | undefined): Modo {
   const v = valor?.trim() || "offline";
   if (v === "offline") return { tipo: "offline" };
-  const [, provedor, modelo] = v.match(/^(ollama|openrouter):(.+)$/) ?? [];
+  const [, provedor, modelo] = v.match(/^(ollama|openrouter|anthropic):(.+)$/) ?? [];
   if (provedor === "ollama" && modelo) return { tipo: "ollama", modelo };
   if (provedor === "openrouter" && modelo?.includes("/")) return { tipo: "openrouter", modelo };
+  if (provedor === "anthropic" && modelo) return { tipo: "anthropic", modelo };
   throw new Error(
-    `modelo inválido: "${v}". Use offline, ollama:<modelo> ou openrouter:<provedor>/<modelo>`,
+    `modelo inválido: "${v}". Use offline, ollama:<modelo>, openrouter:<provedor>/<modelo> ou anthropic:<modelo>`,
   );
 }
 
@@ -32,6 +36,16 @@ function modeloOnline(modo: Exclude<Modo, { tipo: "offline" }>): LanguageModel {
       baseURL: process.env.OLLAMA_URL ?? "http://localhost:11434/v1",
     });
     return ollama.chatModel(modo.modelo);
+  }
+  if (modo.tipo === "anthropic") {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) throw new Error("ANTHROPIC_API_KEY não definida");
+    return wrapLanguageModel({
+      model: createAnthropic({ apiKey })(modo.modelo),
+      middleware: defaultSettingsMiddleware({
+        settings: { providerOptions: { anthropic: { effort: "medium" } } },
+      }),
+    });
   }
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("OPENROUTER_API_KEY não definida");

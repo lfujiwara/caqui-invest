@@ -54,7 +54,7 @@ pnpm eval                                    # as 40 perguntas de dados/pergunta
 - Cada argumento é um turno da conversa.
 - Personas (`ferramentas/personas.ts`): `marta` (C-0001), `rafael` (C-0002), `camila` (C-0003) e `anonimo`.
 - Com `--motivo`, a mensagem vai direto para a fatia e cada tool chamada aparece no terminal (`→` chamada, `←` resultado). Sem `--motivo`, ela passa pelo roteador e pelos guardrails, e o trace aparece no terminal.
-- O modelo padrão é `offline`: determinístico, sem rede, e devolve o artigo da KB mais próximo sem chamar tools. Para exercitar skill e tools, exporte `CAQUI_MODELO_MOTIVO=openrouter:<provedor>/<modelo>` e `OPENROUTER_API_KEY`.
+- O modelo padrão é `offline`: determinístico, sem rede, e devolve o artigo da KB mais próximo sem chamar tools. Para exercitar skill e tools, exporte `CAQUI_MODELO_MOTIVO=anthropic:claude-sonnet-5-5` e `ANTHROPIC_API_KEY` (ou `openrouter:<provedor>/<modelo>` e `OPENROUTER_API_KEY`).
 
 ## Regras do case que o código precisa respeitar
 
