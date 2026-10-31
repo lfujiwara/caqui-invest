@@ -1,0 +1,20 @@
+.marca {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--cq-e-2);
+  font: 600 1.25rem / 1 var(--cq-fonte);
+  letter-spacing: -0.3px;
+  color: var(--cq-tinta);
+  white-space: nowrap;
+}
+
+.invest {
+  font-weight: 400;
+}
+
+@media (max-width: 400px) {
+  .invest {
+    display: none;
+  }
+}

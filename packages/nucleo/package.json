@@ -1,0 +1,24 @@
+{
+  "name": "@caqui/nucleo",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./openui": "./src/openui.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "3.0.82",
+    "@openrouter/ai-sdk-provider": "3.1.0",
+    "@openuidev/lang-core": "1.0.2",
+    "ai": "7.0.159",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3",
+    "vitest": "5.0.5"
+  }
+}

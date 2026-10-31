@@ -16,6 +16,55 @@ Não há trilha, formato esperado nem resposta certa. O grupo lê os dados, esco
 4. Antes de qualquer código, preencha o [SPEC.md](templates/SPEC.md) com as respostas às seis perguntas.
 5. Construa, verifique e publique.
 
+## Como rodar
+
+Precisa de Node 22 e do pnpm via corepack (`corepack enable`). O modo padrão é `offline`: sem rede e determinístico.
+
+```bash
+pnpm install
+pnpm dev        # http://localhost:3000 (web) e /whatsapp
+pnpm check      # biome, tsc por pacote e dependency-cruiser
+pnpm test       # vitest
+pnpm eval       # perguntas_teste.jsonl pelo harness + checar_respostas.py
+pnpm eval --url http://localhost:3000   # o mesmo, pela API publicada
+pnpm build && pnpm start
+```
+
+O canal web desenha `resposta.ui` com o OpenUI (`@openuidev/react-lang` e `@openuidev/lang-core`, 1.0.2). Dois avisos sobre essas dependências:
+
+- Em `pnpm dev`, o `react-lang` monta sozinho um widget de devtools (OpenUI Inspect) no canto da página. A versão 1.0.2 não tem opção pública para desligar; o widget some em `pnpm build && pnpm start`, porque o bundler elimina o bloco quando `NODE_ENV=production`.
+- O `postinstall` do `lang-core` envia telemetria. O pnpm 10 bloqueia scripts de instalação por padrão e o pacote fica fora de `onlyBuiltDependencies` de propósito. O aviso "Ignored build scripts" no `pnpm install` é esperado: não rode `pnpm approve-builds` para ele.
+
+Para usar um modelo de verdade, copie `.env.example` para `.env` e troque `CAQUI_MODELO_ROTEADOR` e `CAQUI_MODELO_MOTIVO` para `ollama:<modelo>` ou `openrouter:<provedor>/<modelo>`.
+
+### Deploy na Vercel
+
+1. Em vercel.com, importe o repositório `lfujiwara/caqui-invest`.
+2. Em **Root Directory**, escolha `apps/caqui`. O framework é detectado como Next.js, e o pnpm instala o workspace inteiro.
+3. Em **Environment Variables**, defina:
+
+| Variável | Valor |
+| --- | --- |
+| `CAQUI_MODELO_ROTEADOR` | `openrouter:nvidia/nemotron-3.5-super-vl:free` |
+| `CAQUI_MODELO_MOTIVO` | `openrouter:nvidia/nemotron-3.5-super-vl:free` |
+| `OPENROUTER_API_KEY` | a sua chave do OpenRouter |
+
+Sem essas variáveis, o app sobe em modo `offline`. Se o OpenRouter falhar ou bater no limite de uso, o roteador cai nos gatilhos e a fatia encaminha para uma pessoa. O erro aparece no trace, nos logs da função. Para gastar metade das chamadas do plano gratuito, deixe `CAQUI_MODELO_ROTEADOR=offline`.
+
+```bash
+docker compose up --build                      # só o app, em http://localhost:3000
+docker compose --profile ollama up --build     # app + ollama
+```
+
+O código fica assim. O app depende de `motivos`, que depende de `nucleo`. Uma fatia nunca importa outra; o `pnpm check` falha se isso acontecer.
+
+```
+apps/caqui/          Next.js, o único deployável: páginas, server action e /api/chat
+packages/nucleo/     contrato zod, harness, roteador, guardrails, modelos, calendário, IR, KB
+packages/motivos/    uma pasta por motivo de contato, cada uma com index, skills, tools e teste
+ferramentas/         avaliar.ts (pnpm eval) e checar_respostas.py
+```
+
 ## O que tem aqui
 
 ```
