@@ -43,10 +43,14 @@ export function RespostaCaqui({
   );
 }
 
+// Os códigos da KB (KB-022) são referência interna. Vão para o log, não para a tela.
+const semCodigoKb = (texto: string) =>
+  texto.replace(/\s*\([^()]*\bKB-\d+[^()]*\)|\s*\bKB-\d+\b/g, "");
+
 function Texto({ texto }: { texto: string }) {
   return (
     <div className={css.texto}>
-      {paragrafos(texto).map(({ inicio, paragrafo }) => (
+      {paragrafos(semCodigoKb(texto)).map(({ inicio, paragrafo }) => (
         <p key={inicio}>{paragrafo}</p>
       ))}
     </div>
@@ -128,10 +132,7 @@ function Fontes({ fontes }: { fontes: Fonte[] }) {
             className={css.chip}
           >
             {fonte.tipo === "kb" ? (
-              <>
-                <span className={css.chipId}>{fonte.id}</span>
-                {fonte.titulo}
-              </>
+              fonte.titulo
             ) : (
               <>
                 <span className={css.chipConta}>Dado da sua conta</span>

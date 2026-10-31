@@ -65,6 +65,8 @@ export function Conversa({
       const historico = paraHistorico(trocas);
       const resposta = await enviar({ canal: "web", mensagem, historico, idCliente, momento });
       const respostaEm = momentoDe(simulado);
+      const kbs = resposta.fontes.flatMap((f) => (f.tipo === "kb" ? [`${f.id} ${f.titulo}`] : []));
+      if (kbs.length) console.info("[caqui/web] fontes da KB", kbs);
       setTrocas((ts) => [
         ...ts,
         { id: ts.length, pergunta: mensagem, resposta, perguntaEm: momento, respostaEm },

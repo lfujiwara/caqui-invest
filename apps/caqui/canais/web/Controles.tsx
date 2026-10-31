@@ -140,6 +140,7 @@ export function Composer({
         className={css.enviar}
         disabled={desabilitado || !texto.trim()}
         aria-label="Enviar"
+        aria-busy={desabilitado}
       >
         <svg
           viewBox="0 0 24 24"

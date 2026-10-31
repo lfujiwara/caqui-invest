@@ -2,48 +2,55 @@
  * Tokens da Caqui Invest no canal web. Estrutura herdada do design.md de referência
  * (uma única cor de ação, cinzas frios, pílulas para o que é clicável, cartões de 24px,
  * uma só sombra, números em fonte mono). Tamanhos e contrastes foram aumentados para
- * o público mais velho: texto-base 18px, alvos de toque de 48px ou mais, todo par de
+ * o público mais velho: texto-base 17px, alvos de toque de 48px ou mais, todo par de
  * texto/fundo com contraste de 7:1 ou mais, exceto o texto sobre a cor de ação (5,8:1).
  *
  * Os tokens ficam escopados em .tema para não vazar para o resto da aplicação.
  */
 
 .tema {
-  --cq-caqui: #b33d0b;
-  --cq-caqui-ativo: #9a3412;
-  --cq-caqui-suave: #fff4ee;
+  /* Paleta da Mistral (getdesign.md/mistral.ai). A ação usa o laranja profundo
+     #cc3a05: branco sobre o #fa520f da marca fica em 3,4:1, abaixo do mínimo. */
+  --cq-caqui: #cc3a05;
+  --cq-caqui-ativo: #a82f03;
+  --cq-caqui-suave: #fff0c2;
   --cq-sobre-caqui: #ffffff;
   --cq-folha: #2f7d4f;
+  --cq-marca: #fa520f;
+  --cq-por-do-sol: linear-gradient(90deg, #cc3a05, #fa520f 25%, #ffa110 50%, #ffd900 75%, #fff8e0);
 
-  --cq-tinta: #0a0b0d;
-  --cq-texto: #2b2f36;
-  --cq-texto-suave: #4b515c;
-  --cq-linha: #dee1e6;
-  --cq-linha-suave: #eef0f3;
+  --cq-tinta: #1f1f1f;
+  --cq-texto: #2c2c2c;
+  --cq-texto-suave: #4a4a4a;
+  --cq-linha: #e5e5e5;
+  --cq-linha-suave: #ededed;
 
-  --cq-fundo: #f7f7f7;
+  --cq-fundo: #fffaeb;
   --cq-cartao: #ffffff;
-  --cq-superficie-forte: #eef0f3;
+  --cq-superficie-forte: #fff0c2;
+  --cq-balao: #fff8e0;
+  --cq-balao-borda: #e6d5a8;
 
   --cq-alerta: #b01c28;
   --cq-alerta-fundo: #fdecee;
   --cq-positivo: #067a48;
 
   --cq-fonte:
-    var(--cq-fonte-inter), Inter, -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
+    var(--cq-fonte-sans), "Source Sans 3", -apple-system, system-ui, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
   --cq-fonte-mono:
     var(--cq-fonte-jetbrains), "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo,
     Consolas, monospace;
 
-  --cq-texto-display: 400 2rem / 1.13 var(--cq-fonte);
-  --cq-texto-titulo: 600 1.25rem / 1.33 var(--cq-fonte);
-  --cq-texto-titulo-p: 600 1.125rem / 1.3 var(--cq-fonte);
-  --cq-texto-corpo: 400 1.125rem / 1.55 var(--cq-fonte);
-  --cq-texto-corpo-p: 400 1rem / 1.5 var(--cq-fonte);
-  --cq-texto-legenda: 600 0.9375rem / 1.4 var(--cq-fonte);
-  --cq-texto-botao: 600 1.0625rem / 1.15 var(--cq-fonte);
-  --cq-texto-numero: 500 1.0625rem / 1.4 var(--cq-fonte-mono);
+  --cq-fonte-display: var(--cq-fonte-newsreader), Georgia, serif;
+  --cq-texto-display: 400 2rem / 1.1 var(--cq-fonte-display);
+  --cq-texto-titulo: 600 1.1875rem / 1.33 var(--cq-fonte);
+  --cq-texto-titulo-p: 600 1.0625rem / 1.3 var(--cq-fonte);
+  --cq-texto-corpo: 400 1.0625rem / 1.55 var(--cq-fonte);
+  --cq-texto-corpo-p: 400 0.9375rem / 1.5 var(--cq-fonte);
+  --cq-texto-legenda: 600 0.875rem / 1.4 var(--cq-fonte);
+  --cq-texto-botao: 600 1rem / 1.15 var(--cq-fonte);
+  --cq-texto-numero: 500 1rem / 1.4 var(--cq-fonte-mono);
 
   --cq-e-1: 4px;
   --cq-e-2: 8px;
@@ -54,13 +61,15 @@
   --cq-e-8: 32px;
   --cq-e-12: 48px;
 
-  --cq-raio-sm: 8px;
-  --cq-raio-md: 12px;
-  --cq-raio-lg: 16px;
-  --cq-raio-xl: 24px;
-  --cq-raio-pilula: 100px;
+  --cq-raio-sm: 6px;
+  --cq-raio-md: 8px;
+  --cq-raio-lg: 12px;
+  --cq-raio-xl: 12px;
+  --cq-raio-pilula: 8px;
 
-  --cq-sombra: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --cq-sombra: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --cq-sombra-balao: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --cq-mola: cubic-bezier(0.34, 1.56, 0.64, 1);
   --cq-alvo: 52px;
   --cq-foco: 0 0 0 3px var(--cq-cartao), 0 0 0 6px var(--cq-caqui);
 
@@ -73,8 +82,8 @@
 
 @media (prefers-color-scheme: dark) {
   .tema:not([data-tema="claro"]) {
-    --cq-caqui: #ff8f57;
-    --cq-caqui-ativo: #f2763a;
+    --cq-caqui: #ff8105;
+    --cq-caqui-ativo: #ffa110;
     --cq-caqui-suave: #2a1408;
     --cq-sobre-caqui: #0a0b0d;
     --cq-folha: #5fcf8c;
@@ -83,9 +92,11 @@
     --cq-texto-suave: #a8acb3;
     --cq-linha: #2c3036;
     --cq-linha-suave: #1f2227;
-    --cq-fundo: #0a0b0d;
-    --cq-cartao: #16181c;
+    --cq-fundo: #141414;
+    --cq-cartao: #1c1c1e;
     --cq-superficie-forte: #23262b;
+    --cq-balao: #2c1d08;
+    --cq-balao-borda: #5a4416;
     --cq-alerta: #ff6b74;
     --cq-alerta-fundo: #2a0c10;
     --cq-positivo: #3ddc97;
@@ -95,8 +106,8 @@
 }
 
 .tema[data-tema="escuro"] {
-  --cq-caqui: #ff8f57;
-  --cq-caqui-ativo: #f2763a;
+  --cq-caqui: #ff8105;
+  --cq-caqui-ativo: #ffa110;
   --cq-caqui-suave: #2a1408;
   --cq-sobre-caqui: #0a0b0d;
   --cq-folha: #5fcf8c;
@@ -105,9 +116,11 @@
   --cq-texto-suave: #a8acb3;
   --cq-linha: #2c3036;
   --cq-linha-suave: #1f2227;
-  --cq-fundo: #0a0b0d;
-  --cq-cartao: #16181c;
+  --cq-fundo: #141414;
+  --cq-cartao: #1c1c1e;
   --cq-superficie-forte: #23262b;
+  --cq-balao: #2c1d08;
+  --cq-balao-borda: #5a4416;
   --cq-alerta: #ff6b74;
   --cq-alerta-fundo: #2a0c10;
   --cq-positivo: #3ddc97;

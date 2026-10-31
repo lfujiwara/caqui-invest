@@ -2,9 +2,16 @@
   display: grid;
   gap: var(--cq-e-4);
   min-width: 0;
+  max-width: 44rem;
+  padding: var(--cq-e-4) var(--cq-e-5);
+  border: 1px solid var(--cq-linha);
+  border-radius: var(--cq-raio-sm) var(--cq-raio-xl) var(--cq-raio-xl) var(--cq-raio-xl);
+  background: var(--cq-cartao);
+  box-shadow: var(--cq-sombra-balao);
 }
 
 .resposta[data-seguranca] {
+  animation: tremer 0.5s 0.35s ease-in-out both;
   padding: var(--cq-e-5);
   border: 3px solid var(--cq-alerta);
   border-radius: var(--cq-raio-xl);
@@ -40,7 +47,7 @@
 /* Encaminhamento */
 
 .handoff {
-  background: var(--cq-cartao);
+  background: var(--cq-fundo);
   border: 1px solid var(--cq-linha);
   border-radius: var(--cq-raio-xl);
   padding: var(--cq-e-5);
@@ -171,6 +178,10 @@
 }
 
 .chip {
+  border: 1px solid var(--cq-linha);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
   display: inline-flex;
   align-items: baseline;
   gap: var(--cq-e-2);
@@ -183,12 +194,6 @@
 
 .chipConta {
   font: var(--cq-texto-legenda);
-  color: var(--cq-texto-suave);
-  white-space: nowrap;
-}
-
-.chipId {
-  font: 600 0.875rem / 1.4 var(--cq-fonte-mono);
   color: var(--cq-texto-suave);
   white-space: nowrap;
 }
@@ -216,12 +221,36 @@
   cursor: pointer;
 }
 
+.opcao,
+.linha,
+.copiar {
+  transition:
+    transform 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.opcao:active,
+.copiar:active {
+  transform: scale(0.96);
+}
+
 .opcao:active {
   background: var(--cq-caqui-suave);
 }
 
+@media (hover: hover) {
+  .opcao:hover {
+    background: var(--cq-caqui-suave);
+    transform: translateY(-2px);
+  }
+
+  .linha:hover {
+    background-color: var(--cq-superficie-forte);
+  }
+}
+
 .lista {
-  background: var(--cq-cartao);
+  background: var(--cq-fundo);
   border: 1px solid var(--cq-linha);
   border-radius: var(--cq-raio-xl);
   padding: var(--cq-e-2) 0;
@@ -282,4 +311,85 @@
 .linhaDescricao {
   font: var(--cq-texto-corpo-p);
   color: var(--cq-texto-suave);
+}
+
+/* Na entrada, cada bloco da resposta sobe um depois do outro. */
+
+.resposta > * {
+  animation: subir 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.resposta > :nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.resposta > :nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.resposta > :nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.resposta > :nth-child(n + 5) {
+  animation-delay: 0.32s;
+}
+
+.chip::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: none;
+  align-self: center;
+  border-radius: 2px;
+  background: var(--cq-marca);
+  transform: rotate(45deg);
+}
+
+.chip {
+  animation: surgir 0.4s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes tremer {
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@media (max-width: 480px) {
+  .resposta[data-seguranca],
+  .handoff {
+    padding: var(--cq-e-4);
+  }
+
+  .botoes {
+    display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resposta,
+  .resposta > *,
+  .chip {
+    animation: none;
+  }
 }
