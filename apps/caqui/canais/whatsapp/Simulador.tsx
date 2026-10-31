@@ -139,18 +139,21 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
                 </button>
               ))}
               {/* Texto com máscara em vez de type="time", que segue o locale e mostraria 11:00 PM. */}
-              <input
-                type="text"
-                inputMode="numeric"
-                autoComplete="off"
-                maxLength={5}
-                placeholder="hh:mm"
-                className={estilos.horaLivre}
-                aria-label="Outro horário, de 00:00 a 23:59"
-                aria-invalid={!horaValida(horaDigitada)}
-                value={horaDigitada}
-                onChange={(e) => escolherHora(mascararHora(e.target.value))}
-              />
+              <label className={estilos.horaLivre}>
+                <span aria-hidden>ou digite</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={5}
+                  placeholder="hh:mm"
+                  className={estilos.horaCampo}
+                  aria-label="Outro horário, de 00:00 a 23:59"
+                  aria-invalid={!horaValida(horaDigitada)}
+                  value={horaDigitada}
+                  onChange={(e) => escolherHora(mascararHora(e.target.value))}
+                />
+              </label>
             </fieldset>
           </div>
           <p className={estilos.momentoNota}>
