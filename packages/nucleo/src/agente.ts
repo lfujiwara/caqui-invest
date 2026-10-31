@@ -10,11 +10,16 @@ import {
 import { z } from "zod";
 import type { ChatRequest, Fonte, MotivoId, Resposta } from "./contrato";
 import { artigosKb } from "./kb";
+import { especificacaoOpenUI } from "./openui";
 
 /** Saída estruturada de toda fatia com LLM. O modelo offline gera exatamente este formato. */
 export const SaidaAgente = z.object({
   texto: z.string().min(1),
   kbs: z.array(z.string()).describe("ids dos artigos (KB-xxx) que sustentam o texto"),
+  ui: z
+    .string()
+    .optional()
+    .describe("Só no canal web: programa OpenUI Lang que ilustra a resposta. Omita no WhatsApp."),
 });
 export type SaidaAgente = z.infer<typeof SaidaAgente>;
 
@@ -58,7 +63,7 @@ export async function rodarAgente(args: {
   ];
   const resultado = await generateText({
     model: args.modelo,
-    instructions: `${REGRAS_GERAIS}\nAgora é ${args.req.momento}.\n\n${args.skill}\n\nArtigos que você pode citar:\n\n${artigos}`,
+    instructions: `${REGRAS_GERAIS}\nAgora é ${args.req.momento}.\n\n${args.skill}\n\nArtigos que você pode citar:\n\n${artigos}${args.req.canal === "web" ? `\n\n${especificacaoOpenUI}` : ""}`,
     messages,
     tools: {
       ...args.tools,
@@ -93,7 +98,7 @@ export async function rodarAgente(args: {
     texto: saida.texto,
     fontes: [...kbs, ...new Map(daConta.map((f) => [JSON.stringify(f), f])).values()],
     interacao: null,
-    ui: null,
+    ui: saida.ui ?? null, // adaptarAoCanal descarta a ui inválida e a do WhatsApp
     handoff: null,
   };
 }

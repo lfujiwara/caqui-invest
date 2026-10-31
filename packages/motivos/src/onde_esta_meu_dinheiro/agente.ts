@@ -25,5 +25,6 @@ export async function responder(req: ChatRequest, ctx: Contexto) {
     req,
     modelo: ctx.modelo,
   });
-  return { ...resposta, ui };
+  // A Timeline montada pela tool usa as datas do calendário; a do modelo fica de reserva.
+  return { ...resposta, ui: ui ?? resposta.ui };
 }
