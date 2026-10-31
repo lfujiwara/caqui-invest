@@ -1,7 +1,7 @@
 "use client";
 
 import type { Fonte, Handoff, Interacao, Resposta } from "@caqui/nucleo";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { formatarRetorno } from "./momento";
 import { ROTULO_FILA } from "./openui/componentes";
 import { UiGerada } from "./openui/UiGerada";
@@ -51,9 +51,35 @@ function Texto({ texto }: { texto: string }) {
   return (
     <div className={css.texto}>
       {paragrafos(semCodigoKb(texto)).map(({ inicio, paragrafo }) => (
-        <p key={inicio}>{paragrafo}</p>
+        <p key={inicio}>{markdownSimples(paragrafo)}</p>
       ))}
     </div>
+  );
+}
+
+/**
+ * O modelo escreve em markdown. Basta o que ele usa: negrito, título e item de lista.
+ * O resto do texto fica como veio, com as quebras de linha do `pre-line`.
+ */
+export function markdownSimples(paragrafo: string): ReactNode[] {
+  return paragrafo.split("\n").flatMap((linha, l) => {
+    const titulo = /^#{1,6}\s+(.*)$/.exec(linha);
+    const conteudo = titulo
+      ? // biome-ignore lint/suspicious/noArrayIndexKey: o texto de uma resposta não muda de ordem.
+        [<strong key={`${l}t`}>{negritos(titulo[1] ?? "", l)}</strong>]
+      : negritos(linha.replace(/^(\s*)[-*]\s+/, "$1• "), l);
+    return l === 0 ? conteudo : ["\n", ...conteudo];
+  });
+}
+
+/** `l` é a linha: entra na key porque as linhas de um parágrafo viram um array só. */
+function negritos(linha: string, l: number): ReactNode[] {
+  // split com grupo: as posições ímpares são o que estava entre os **.
+  return (
+    linha
+      .split(/\*\*(.+?)\*\*/g)
+      // biome-ignore lint/suspicious/noArrayIndexKey: o texto de uma resposta não muda de ordem.
+      .map((parte, i) => (i % 2 ? <strong key={`${l}:${i}`}>{parte}</strong> : parte))
   );
 }
 

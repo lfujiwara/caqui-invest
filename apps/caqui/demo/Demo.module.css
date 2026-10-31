@@ -136,9 +136,17 @@
   background: #fffaeb;
 }
 
-/* O chat ocupa a viewport inteira na página principal; aqui, só a tela do celular. */
-.tela > * > * {
+/* O chat ocupa a viewport inteira na página principal; aqui, só a tela do celular.
+   min-height em % não resolve dentro de pai sem altura, então a tela vira flex e o chat cresce. */
+.tela > div {
   min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tela > div > div {
+  flex: 1;
+  min-height: 0;
 }
 
 .limpar,
