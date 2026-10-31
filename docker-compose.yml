@@ -1,0 +1,24 @@
+services:
+  caqui:
+    build:
+      context: .
+      dockerfile: apps/caqui/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      CAQUI_MODELO_ROTEADOR: ${CAQUI_MODELO_ROTEADOR:-offline}
+      CAQUI_MODELO_MOTIVO: ${CAQUI_MODELO_MOTIVO:-offline}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434/v1}
+
+  # docker compose --profile ollama up, com CAQUI_MODELO_*=ollama:<modelo> no .env
+  ollama:
+    image: ollama/ollama:0.12.6
+    profiles: [ollama]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+
+volumes:
+  ollama:
