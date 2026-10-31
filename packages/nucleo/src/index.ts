@@ -20,7 +20,7 @@ export * from "./financas";
 export { detectarGolpe, pedeDadoDeTerceiro } from "./guardrails/entrada";
 export { atender } from "./harness";
 export { artigo, buscarKb, fonteKb, KB_OBSOLETAS } from "./kb";
-export { descreverModelos } from "./modelos";
+export { descreverModelos, modeloDoMotivo } from "./modelos";
 export type { Contexto, Motivo, Motivos } from "./motivo";
 export { ORDEM_DOS_GATILHOS } from "./roteador";
 export { linhaDeTrace, type Registrar, type Trace } from "./trace";

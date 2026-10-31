@@ -54,7 +54,8 @@ const termos = (s: string) =>
   );
 
 /**
- * Busca por termos com peso IDF entre os artigos permitidos. Artigos obsoletos nunca voltam.
+ * Busca por termos com peso IDF entre os artigos permitidos; no empate, ganha quem tem mais termos no título.
+ * Artigos obsoletos nunca voltam.
  * Devolve do mais relevante para o menos; artigo sem nenhum termo em comum fica de fora.
  */
 export function buscarKb(consulta: string, permitidos: readonly string[], limite = 3): Artigo[] {
@@ -66,13 +67,15 @@ export function buscarKb(consulta: string, permitidos: readonly string[], limite
     .filter((a) => permitidos.includes(a.id))
     .map((a) => {
       const doArtigo = termosPorArtigo.get(a.id) ?? new Set<string>();
+      const doTitulo = termos(a.titulo);
       const pontos = daConsulta
         .filter((t) => doArtigo.has(t))
         .reduce((soma, t) => soma + Math.log(todos.length / df(t)), 0);
-      return { a, pontos };
+      const noTitulo = daConsulta.filter((t) => doTitulo.has(t)).length;
+      return { a, pontos, noTitulo };
     })
     .filter(({ pontos }) => pontos > 0)
-    .sort((x, y) => y.pontos - x.pontos)
+    .sort((x, y) => y.pontos - x.pontos || y.noTitulo - x.noTitulo)
     .slice(0, limite)
     .map(({ a }) => a);
 }

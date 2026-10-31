@@ -38,7 +38,10 @@ export async function rodarAgente(args: {
   req: ChatRequest;
   modelo: LanguageModel;
 }): Promise<Resposta> {
-  const artigos = args.kbs.map((id) => `- ${id}: ${artigosKb().get(id)?.titulo}`).join("\n");
+  const artigos = args.kbs
+    .map((id) => artigosKb().get(id))
+    .map((a) => `## ${a?.id}: ${a?.titulo}\n${a?.texto}`)
+    .join("\n\n");
   const messages: ModelMessage[] = [
     ...args.req.historico.map(
       (m): ModelMessage =>
@@ -50,7 +53,7 @@ export async function rodarAgente(args: {
   ];
   const resultado = await generateText({
     model: args.modelo,
-    instructions: `${REGRAS_GERAIS}\n\n${args.skill}\n\nArtigos que você pode citar:\n${artigos}`,
+    instructions: `${REGRAS_GERAIS}\n\n${args.skill}\n\nArtigos que você pode citar:\n\n${artigos}`,
     messages,
     tools: args.tools,
     output: Output.object({ schema: SaidaAgente }),

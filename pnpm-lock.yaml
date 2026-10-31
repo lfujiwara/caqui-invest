@@ -21,6 +21,28 @@ importers:
         specifier: 5.0.5
         version: 5.0.5(@types/node@22.20.5)(vite@8.3.5(@types/node@22.20.5))
 
+  packages/motivos:
+    dependencies:
+      '@caqui/nucleo':
+        specifier: workspace:*
+        version: link:../nucleo
+      ai:
+        specifier: 7.0.159
+        version: 7.0.159(zod@4.6.7)
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.0.5
+        version: 5.0.5(@types/node@22.20.5)(vite@8.3.5(@types/node@22.20.5))
+
   packages/nucleo:
     dependencies:
       '@ai-sdk/openai-compatible':
