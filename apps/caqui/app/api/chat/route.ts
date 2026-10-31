@@ -1,6 +1,8 @@
 import { ChatRequest } from "@caqui/nucleo";
 import { atender } from "../../../lib/atender";
 
+export const maxDuration = 60;
+
 export async function POST(request: Request): Promise<Response> {
   let corpo: unknown;
   try {

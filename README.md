@@ -37,6 +37,20 @@ O canal web desenha `resposta.ui` com o OpenUI (`@openuidev/react-lang` e `@open
 
 Para usar um modelo de verdade, copie `.env.example` para `.env` e troque `CAQUI_MODELO_ROTEADOR` e `CAQUI_MODELO_MOTIVO` para `ollama:<modelo>` ou `openrouter:<provedor>/<modelo>`.
 
+### Deploy na Vercel
+
+1. Em vercel.com, importe o repositório `lfujiwara/caqui-invest`.
+2. Em **Root Directory**, escolha `apps/caqui`. O framework é detectado como Next.js, e o pnpm instala o workspace inteiro.
+3. Em **Environment Variables**, defina:
+
+| Variável | Valor |
+| --- | --- |
+| `CAQUI_MODELO_ROTEADOR` | `openrouter:nvidia/nemotron-3.5-super-vl:free` |
+| `CAQUI_MODELO_MOTIVO` | `openrouter:nvidia/nemotron-3.5-super-vl:free` |
+| `OPENROUTER_API_KEY` | a sua chave do OpenRouter |
+
+Sem essas variáveis, o app sobe em modo `offline`. Se o OpenRouter falhar ou bater no limite de uso, o roteador cai nos gatilhos e a fatia encaminha para uma pessoa. O erro aparece no trace, nos logs da função. Para gastar metade das chamadas do plano gratuito, deixe `CAQUI_MODELO_ROTEADOR=offline`.
+
 ```bash
 docker compose up --build                      # só o app, em http://localhost:3000
 docker compose --profile ollama up --build     # app + ollama
