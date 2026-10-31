@@ -19,8 +19,8 @@ const normalizar = (texto: string) =>
     .replace(/\s+/g, " ");
 
 const SINAIS_DE_GOLPE = [
-  /\b(c[oó]digo|sms|token|senha)\b.*\b(pediu|pedindo|pediram|passar|mandar|confirmar)\b/,
-  /\b(pediu|pedindo|pediram|passar|mandar)\b.*\b(c[oó]digo|sms|token|senha)\b/,
+  /\b(c[oó]digos?|sms|tokens?|senhas?)\b.*\b(pediu|pedindo|pediram|passar|mandar|confirmar)\b/,
+  /\b(pediu|pedindo|pediram|passar|mandar)\b.*\b(c[oó]digos?|sms|tokens?|senhas?)\b/,
   /\b(suporte|acesso) remoto\b|\banydesk\b|\bteamviewer\b/,
   /\bpix de teste\b|\b(transfer[eê]ncia|pix)\b.*\bpra n[aã]o bloquear\b/,
   /\bgerente\b.*\b(ligou|liga[cç][aã]o)\b.*\b(c[oó]digo|senha|transfer)/,
