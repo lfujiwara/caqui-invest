@@ -5,6 +5,7 @@ import {
   fonteKb,
   type Motivo,
   type Resposta,
+  SEM_GUARDRAILS_PROPRIOS,
   somarDiasCorridos,
 } from "@caqui/nucleo";
 
@@ -66,5 +67,6 @@ export const MOTIVO: Motivo = {
   gatilhos: /reclama|encerr|cancel|fechar (a |minha )?conta|procon|ouvidoria|insatisfeit/i,
   regras: [7],
   kbs: ["KB-018", "KB-026", "KB-027"],
+  guardrails: SEM_GUARDRAILS_PROPRIOS,
   responder,
 };

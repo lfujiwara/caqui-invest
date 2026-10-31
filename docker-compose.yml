@@ -11,6 +11,25 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434/v1}
 
+  # Ambiente de dev para agentes: docker compose run --rm dev pnpm test
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    profiles: [dev]
+    volumes:
+      - .:/repo
+      # Volumes anônimos: o container usa os node_modules Linux da imagem e não toca os do host.
+      - /repo/node_modules
+      - /repo/apps/caqui/node_modules
+      - /repo/packages/nucleo/node_modules
+      - /repo/packages/motivos/node_modules
+      - /repo/ferramentas/node_modules
+    environment:
+      CAQUI_MODELO_ROTEADOR: ${CAQUI_MODELO_ROTEADOR:-offline}
+      CAQUI_MODELO_MOTIVO: ${CAQUI_MODELO_MOTIVO:-offline}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+
   # docker compose --profile ollama up, com CAQUI_MODELO_*=ollama:<modelo> no .env
   ollama:
     image: ollama/ollama:0.12.6

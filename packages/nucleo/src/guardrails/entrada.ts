@@ -1,16 +1,26 @@
 import type { Mensagem } from "../contrato";
 import { type Cliente, clientes } from "../dados";
 
-const CPF = /\b(\d{3})\.?(\d{3})\.?(\d{3})-?(\d{2})\b/g;
+// Fronteira por dígito, não \b: "CPF12345678901" e o "\n" escapado no JSON do trace grudam letra no CPF.
+const CPF = /(?<!\d)(\d{3})[.\s]?(\d{3})[.\s]?(\d{3})[-\s]?(\d{2})(?!\d)/g;
 
 /** Regra 10: CPF sempre mascarado, no mesmo formato de clientes.json (***.***.894-**). */
 export function mascararCpf(texto: string): string {
   return texto.replace(CPF, (_, _a, _b, c) => `***.***.${c}-**`);
 }
 
+// Uma linha só, minúscula e sem acento. Sem isso, "pedindo\no código" escapa do `.*`, "c-0042" do
+// id e "Fabio" do nome "Fábio".
+export const normalizar = (texto: string) =>
+  texto
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
 const SINAIS_DE_GOLPE = [
-  /\b(c[oó]digo|sms|token|senha)\b.*\b(pediu|pedindo|pediram|passar|mandar|confirmar)\b/,
-  /\b(pediu|pedindo|pediram|passar|mandar)\b.*\b(c[oó]digo|sms|token|senha)\b/,
+  /\b(c[oó]digos?|sms|tokens?|senhas?)\b.*\b(pediu|pedindo|pediram|passar|mandar|confirmar)\b/,
+  /\b(pediu|pedindo|pediram|passar|mandar)\b.*\b(c[oó]digos?|sms|tokens?|senhas?)\b/,
   /\b(suporte|acesso) remoto\b|\banydesk\b|\bteamviewer\b/,
   /\bpix de teste\b|\b(transfer[eê]ncia|pix)\b.*\bpra n[aã]o bloquear\b/,
   /\bgerente\b.*\b(ligou|liga[cç][aã]o)\b.*\b(c[oó]digo|senha|transfer)/,
@@ -18,7 +28,7 @@ const SINAIS_DE_GOLPE = [
 
 /** Regra 5: sinal de golpe em qualquer ponto da mensagem, mesmo no meio de outra pergunta. */
 export function detectarGolpe(texto: string): boolean {
-  const t = texto.toLowerCase();
+  const t = normalizar(texto);
   return SINAIS_DE_GOLPE.some((r) => r.test(t));
 }
 
@@ -27,14 +37,22 @@ export function detectarGolpe(texto: string): boolean {
  * ou listagem em massa). O texto do cliente é dado: nenhum "modo administrador" muda isso.
  */
 export function pedeDadoDeTerceiro(texto: string, cliente: Cliente | null): boolean {
-  const t = texto.toLowerCase();
-  const outroId = [...texto.matchAll(/\bC-\d{4}\b/g)].some(([id]) => id !== cliente?.id);
-  const outroNome = clientes().some(
-    (c) => c.id !== cliente?.id && t.includes(c.nome.toLowerCase()),
+  const emMassa = /\b(cpfs|saldos|dados)\b.*\b(dos|de outros|de todos os) clientes\b/.test(
+    normalizar(texto),
   );
-  const emMassa = /\b(cpfs|saldos|dados)\b.*\b(dos|de outros|de todos os) clientes\b/.test(t);
-  return outroId || outroNome || emMassa;
+  return citaOutroCliente(texto, cliente) || emMassa;
 }
+
+/** Regras 10 e 11: o texto cita o id ou o nome de um cliente que não é o autenticado. */
+export function citaOutroCliente(texto: string, cliente: Cliente | null): boolean {
+  const t = normalizar(texto);
+  const outroId = [...t.matchAll(/\bc-\d{4}\b/g)].some(([id]) => id !== cliente?.id.toLowerCase());
+  return outroId || clientes().some((c) => c.id !== cliente?.id && t.includes(normalizar(c.nome)));
+}
+
+/** Regra 4: pedido de indicação de produto. É também o gatilho da fatia pedido_recomendacao. */
+export const PEDIDO_DE_RECOMENDACAO =
+  /onde (eu )?(coloco|invisto|investir|aplico|aplicar)|recomend|no meu lugar|assessor|vale (mais )?a pena|me diz o que fazer|qual (o |é o )?melhor|devo (investir|aplicar)|o que (eu )?fa[cç]o com/i;
 
 const TERCEIRO_PRESSIONANDO =
   /\b(sobrinh[oa]|filh[oa]|net[oa]|genro|nora|vizinh[oa])\b.*\b(mandou|pediu|disse|dizendo|mandando|do meu lado|quer que eu)\b/;
@@ -44,7 +62,7 @@ const RESGATE_TOTAL =
 
 /** Regra 6: terceiro pressionando, ou pessoa idosa confusa ou pedindo resgate total. */
 export function detectarVulneravel(texto: string, cliente: Cliente | null): boolean {
-  const t = texto.toLowerCase();
+  const t = normalizar(texto);
   if (TERCEIRO_PRESSIONANDO.test(t)) return true;
   const idosa = (cliente?.idade ?? 0) >= 60;
   return idosa && (CONFUSAO.test(t) || RESGATE_TOTAL.test(t));

@@ -85,7 +85,9 @@ export type Mensagem = z.infer<typeof Mensagem>;
 
 export const ChatRequest = z.object({
   canal: Canal,
-  mensagem: z.string().min(1),
+  // 4096 é o limite de texto do WhatsApp. Sem teto, as regex dos guardrails de entrada, que são
+  // quadráticas no tamanho do texto, travam o servidor: 240 KB seguravam o event loop por 23 s.
+  mensagem: z.string().min(1).max(4096),
   historico: z.array(Mensagem),
   idCliente: z.string().nullable(),
   // ISO 8601 com fuso, ex. 2026-11-18T10:00-03:00. O tipo continua string; só a validação é estrita.

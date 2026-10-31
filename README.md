@@ -37,6 +37,47 @@ O canal web desenha `resposta.ui` com o OpenUI (`@openuidev/react-lang` e `@open
 
 Para usar um modelo de verdade, copie `.env.example` para `apps/caqui/.env` e troque `CAQUI_MODELO_ROTEADOR` e `CAQUI_MODELO_MOTIVO` para `ollama:<modelo>` ou `openrouter:<provedor>/<modelo>`. O `pnpm dev` e o `pnpm start` rodam o Next dentro de `apps/caqui`, e ele só lê o `.env` dessa pasta: um `.env` na raiz é ignorado. O `docker compose` faz o contrário e lê o `.env` da raiz. Para usar o mesmo arquivo nos dois, rode `docker compose --env-file apps/caqui/.env up --build`. O `pnpm eval` não lê nenhum dos dois, então exporte as variáveis no shell antes de rodá-lo.
 
+### Desenvolver um motivo
+
+O guia para agentes (Codex e Claude Code) é o [AGENTS.md](AGENTS.md). A skill `motivo` (`$motivo <id>` no Codex, `/motivo <id>` no Claude Code) fica em `.agents/skills/`, com link em `.claude/skills/`, e prende o agente na pasta de um motivo. Sem Node local, use o `Dockerfile.dev`:
+
+```bash
+docker compose run --rm dev pnpm conversar --persona marta
+docker compose run --rm dev pnpm check
+```
+
+
+O `pnpm conversar` abre uma conversa no terminal como uma das personas do CASE, cada uma ligada a um cliente de `dados/clientes.json` (em [`ferramentas/personas.ts`](ferramentas/personas.ts)): `marta` (C-0001), `rafael` (C-0002), `camila` (C-0003) e `anonimo` (sem login).
+
+```bash
+pnpm conversar --persona marta                                    # REPL pelo atendimento completo, com trace
+pnpm conversar --persona rafael --motivo rentabilidade_extrato    # direto na fatia, mostra cada tool chamada
+pnpm conversar --persona camila "oi" "e o CDB?"                   # um turno por argumento e sai
+pnpm conversar --persona marta --roteiro                          # manda as mensagens típicas da persona
+pnpm conversar --momento 2026-11-18T16:10-03:00                   # muda o "agora"
+```
+
+Com `--motivo`, a mensagem não passa pelo roteador nem pelos guardrails do harness. O modelo `offline` não chama tools, então para ver uma tool em ação exporte `CAQUI_MODELO_MOTIVO` com um modelo online.
+
+Toda fatia pode usar as tools da conta de `toolsDaConta(ctx)` (em [`conta.ts`](packages/nucleo/src/conta.ts)): `consultarCadastro`, `consultarPosicoes`, `consultarExtrato` (filtra por período, tipo e status) e `consultarAtendimentos` (o histórico de `conversas.csv`). Elas leem os dados sintéticos e só enxergam o cliente autenticado.
+
+```ts
+tools: { ...toolsDaConta(ctx), ...criarTools(ctx) },
+```
+
+Uma tool nova, mesmo mockada, é um `tool()` do AI SDK no `tools.ts` da fatia. Se ela lê a conta, devolva `fonte`: o texto vira uma fonte do tipo conta na resposta.
+
+```ts
+consultarLimitePix: tool({
+  description: "Limite de Pix noturno do cliente.",
+  inputSchema: z.object({}),
+  execute: async (): Promise<DaConta<{ limite: number }>> => ({
+    fonte: "Seus limites na Caqui",
+    limite: 1000, // mock: troque pela consulta de verdade
+  }),
+}),
+```
+
 ### Deploy na Vercel
 
 1. Em vercel.com, importe o repositório `lfujiwara/caqui-invest`.

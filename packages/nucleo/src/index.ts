@@ -1,10 +1,13 @@
-export { type DaConta, rodarAgente, SaidaAgente } from "./agente";
+export { type DaConta, rodarAgente, SaidaAgente, TOOL_DA_RESPOSTA } from "./agente";
 export { encaminhar, humanoDisponivel } from "./atendimento";
 export * from "./calendario";
+export { toolsDaConta } from "./conta";
 export * from "./contrato";
 export {
   type Cliente,
+  type Conversa,
   clientePorId,
+  conversas,
   lerDoRepo,
   type Operacao,
   operacoes,
@@ -17,7 +20,21 @@ export {
   produtoPorCodigo,
 } from "./dados";
 export * from "./financas";
-export { detectarGolpe, pedeDadoDeTerceiro } from "./guardrails/entrada";
+export type {
+  Encaminhamento,
+  GuardrailEntrada,
+  GuardrailSaida,
+  GuardrailsDoMotivo,
+} from "./guardrails/camadas";
+export { detectarGolpe, PEDIDO_DE_RECOMENDACAO, pedeDadoDeTerceiro } from "./guardrails/entrada";
+export {
+  GUARDRAILS_DE_FATIA_COM_LLM,
+  pedidoDeRecomendacao,
+  SEM_GUARDRAILS_PROPRIOS,
+  semEntender,
+  semRecomendacao,
+  TEXTO_SEM_RECOMENDACAO,
+} from "./guardrails/por_motivo";
 export { atender } from "./harness";
 export { artigo, buscarKb, fonteKb, KB_OBSOLETAS } from "./kb";
 export { descreverModelos, modeloDoMotivo } from "./modelos";

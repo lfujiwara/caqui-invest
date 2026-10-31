@@ -66,6 +66,9 @@ importers:
       '@caqui/nucleo':
         specifier: workspace:*
         version: link:../packages/nucleo
+      ai:
+        specifier: 7.0.159
+        version: 7.0.159(zod@4.6.7)
     devDependencies:
       '@types/node':
         specifier: 22.20.5

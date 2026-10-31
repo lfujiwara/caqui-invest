@@ -1,4 +1,4 @@
-import type { Motivo } from "@caqui/nucleo";
+import { GUARDRAILS_DE_FATIA_COM_LLM, type Motivo } from "@caqui/nucleo";
 import { KBS, responder } from "./agente";
 
 export const MOTIVO: Motivo = {
@@ -13,5 +13,6 @@ export const MOTIVO: Motivo = {
   gatilhos: /rend(eu|imento|endo|e )|rentabilidade|extrato|\bsaldo\b|poupan[cç]a|l[ií]quido|bruto/i,
   regras: [3],
   kbs: KBS,
+  guardrails: GUARDRAILS_DE_FATIA_COM_LLM,
   responder,
 };
