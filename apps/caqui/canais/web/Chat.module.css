@@ -9,6 +9,37 @@
   white-space: nowrap;
 }
 
+.marca svg {
+  animation: brotar 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.marca:hover svg {
+  animation: balancar 0.6s ease-in-out;
+}
+
+@keyframes brotar {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-30deg);
+  }
+}
+
+@keyframes balancar {
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marca svg,
+  .marca:hover svg {
+    animation: none;
+  }
+}
+
 .invest {
   font-weight: 400;
 }

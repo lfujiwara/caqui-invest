@@ -11,6 +11,31 @@
   color: var(--cq-sobre-caqui);
   font: var(--cq-texto-botao);
   cursor: pointer;
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--cq-caqui) 70%, transparent);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .humano:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--cq-caqui) 80%, transparent);
+  }
+
+  .sugestao:hover {
+    transform: translateY(-2px);
+    border-color: var(--cq-caqui);
+    box-shadow: var(--cq-sombra);
+  }
+}
+
+.humano:active,
+.sugestao:active,
+.enviar:not(:disabled):active,
+.secundario:active {
+  transform: scale(0.96);
 }
 
 .humano:active {
@@ -46,16 +71,64 @@
   height: 10px;
   border-radius: 9999px;
   background: var(--cq-positivo);
+  animation: respirar 2s ease-out infinite;
+}
+
+@keyframes respirar {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cq-positivo) 60%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+  }
 }
 
 .aviso[data-disponivel="false"] .ponto {
   background: var(--cq-texto-suave);
+  animation: none;
 }
 
 /* Conversa vazia */
 
 .vazio {
   padding: var(--cq-e-6) 0;
+}
+
+.saudacao,
+.convite,
+.sugestoes li {
+  animation: subir 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.convite {
+  animation-delay: 0.08s;
+}
+
+.sugestoes li:nth-child(1) {
+  animation-delay: 0.16s;
+}
+
+.sugestoes li:nth-child(2) {
+  animation-delay: 0.22s;
+}
+
+.sugestoes li:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+.sugestoes li:nth-child(4) {
+  animation-delay: 0.34s;
+}
+
+.sugestoes li:nth-child(n + 5) {
+  animation-delay: 0.4s;
+}
+
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
 }
 
 .saudacao {
@@ -99,6 +172,10 @@
   text-align: left;
   font: inherit;
   cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .sugestao:active {
@@ -119,6 +196,12 @@
 
 .digitando {
   margin: var(--cq-e-4) 0 0;
+  width: fit-content;
+  padding: var(--cq-e-3) var(--cq-e-5);
+  border: 1px solid var(--cq-linha);
+  border-radius: var(--cq-raio-sm) var(--cq-raio-xl) var(--cq-raio-xl) var(--cq-raio-xl);
+  background: var(--cq-cartao);
+  box-shadow: var(--cq-sombra-balao);
   display: flex;
   align-items: center;
   gap: var(--cq-e-3);
@@ -138,6 +221,42 @@
   animation: pulsar 1.2s infinite ease-in-out;
 }
 
+.digitando {
+  animation: subir 0.4s ease both;
+}
+
+.digitando::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 9999px;
+  border: 2.5px solid var(--cq-linha);
+  border-top-color: var(--cq-caqui);
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enquanto a mensagem vai, a seta vira spinner. */
+.enviar[aria-busy="true"] svg {
+  display: none;
+}
+
+.enviar[aria-busy="true"]::after {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  animation: girar 0.7s linear infinite;
+}
+
 .pontos i:nth-child(2) {
   animation-delay: 0.15s;
 }
@@ -154,6 +273,7 @@
   }
   40% {
     opacity: 1;
+    transform: translateY(-5px);
   }
 }
 
@@ -161,6 +281,22 @@
   .pontos i {
     animation: none;
     opacity: 0.7;
+  }
+
+  .ponto,
+  .digitando,
+  .digitando::before,
+  .enviar[aria-busy="true"]::after,
+  .saudacao,
+  .convite,
+  .sugestoes li {
+    animation: none;
+  }
+
+  .humano,
+  .sugestao,
+  .enviar {
+    transition: none;
   }
 }
 
@@ -194,30 +330,52 @@
 
 .composer {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--cq-e-2);
   padding: var(--cq-e-1);
   border: 1.5px solid var(--cq-linha);
-  border-radius: 30px;
+  border-radius: var(--cq-raio-lg);
   background: var(--cq-cartao);
+}
+
+.composer {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .composer:focus-within {
   border-color: var(--cq-caqui);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--cq-caqui) 18%, transparent);
 }
 
 .campo {
   flex: 1;
   min-width: 0;
   height: var(--cq-alvo);
+  max-height: 9rem;
+  field-sizing: content;
   box-sizing: border-box;
   resize: none;
-  padding: 13px var(--cq-e-3) 13px var(--cq-e-4);
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 12px var(--cq-e-3) 12px var(--cq-e-4);
   border: 0;
   outline: none;
   background: transparent;
   color: var(--cq-tinta);
   font: var(--cq-texto-corpo);
+}
+
+.campo::-webkit-scrollbar {
+  display: none;
+}
+
+@supports (field-sizing: content) {
+  .campo {
+    height: auto;
+    min-height: var(--cq-alvo);
+  }
 }
 
 .campo::placeholder {
@@ -231,14 +389,27 @@
   display: grid;
   place-items: center;
   border: 0;
-  border-radius: 9999px;
+  border-radius: var(--cq-raio-md);
   background: var(--cq-caqui);
   color: var(--cq-sobre-caqui);
   cursor: pointer;
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.2s ease;
+}
+
+.enviar:not(:disabled) svg {
+  animation: estourar 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes estourar {
+  from {
+    transform: scale(0.4) translateY(6px);
+  }
 }
 
 .enviar:disabled {
-  background: var(--cq-superficie-forte);
+  background: var(--cq-linha);
   color: var(--cq-texto-suave);
   cursor: default;
 }
@@ -254,6 +425,7 @@
 }
 
 .momento select {
+  min-width: 0;
   min-height: 36px;
   padding: 0 var(--cq-e-2);
   border: 1px solid var(--cq-linha);
@@ -270,4 +442,22 @@
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .humano {
+    padding: 0 var(--cq-e-4);
+  }
+
+  .aviso {
+    font-size: 0.9375rem;
+  }
+
+  .saudacao {
+    font-size: 1.75rem;
+  }
+
+  .momento {
+    white-space: nowrap;
+  }
 }

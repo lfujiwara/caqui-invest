@@ -1,10 +1,15 @@
 import type { Enviar } from "@caqui/nucleo";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Newsreader, Source_Sans_3 } from "next/font/google";
 import css from "./Chat.module.css";
 import { Conversa } from "./Conversa";
 import tokens from "./tokens.module.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--cq-fonte-inter", display: "swap" });
+const sans = Source_Sans_3({ subsets: ["latin"], variable: "--cq-fonte-sans", display: "swap" });
+const serifa = Newsreader({
+  subsets: ["latin"],
+  variable: "--cq-fonte-newsreader",
+  display: "swap",
+});
 const mono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--cq-fonte-jetbrains",
@@ -14,7 +19,7 @@ const mono = JetBrains_Mono({
 /** Canal web da Caqui Invest. `enviar` é a server action que fala com o núcleo. */
 export function Chat({ enviar, idCliente = null }: { enviar: Enviar; idCliente?: string | null }) {
   return (
-    <div className={`${tokens.tema} ${inter.variable} ${mono.variable}`}>
+    <div className={`${tokens.tema} ${sans.variable} ${serifa.variable} ${mono.variable}`}>
       <Conversa enviar={enviar} idCliente={idCliente}>
         <Marca />
       </Conversa>
