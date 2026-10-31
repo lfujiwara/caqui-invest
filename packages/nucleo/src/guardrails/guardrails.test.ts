@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Resposta } from "../contrato";
 import { clientePorId, perguntaDeTeste, perguntasDeTeste } from "../dados";
+import { linhaDeTrace } from "../trace";
 import {
   detectarGolpe,
   detectarVulneravel,
@@ -15,6 +16,35 @@ describe("regra 10: CPF mascarado", () => {
   it.each(["123.456.789-01", "12345678901"])("%s", (cpf) => {
     const t = mascararCpf(`meu cpf é ${cpf}, confere?`);
     expect(t).toBe("meu cpf é ***.***.789-**, confere?");
+  });
+
+  it.each([
+    ["CPF12345678901", "CPF***.***.789-**"],
+    ["cpf_123.456.789-01", "cpf_***.***.789-**"],
+    ["123 456 789 01", "***.***.789-**"],
+  ])("%s, colado em letra ou separado por espaço", (texto, mascarado) => {
+    expect(mascararCpf(texto)).toBe(mascarado);
+  });
+
+  it("a linha de trace mascara o CPF que vem depois de um escape do JSON", () => {
+    const linha = linhaDeTrace({
+      momento: "2026-11-18T10:00-03:00",
+      canal: "web",
+      idCliente: null,
+      mensagem: "oi",
+      motivo: "outros",
+      acao: "responder",
+      protocolo: null,
+      guardrails: [],
+      erro: "falhou:\n12345678901",
+    });
+    expect(linha).not.toContain("12345678901");
+  });
+
+  it("não mascara número que só contém onze dígitos dentro de um maior", () => {
+    expect(mascararCpf("CAQ-20261118-123456 e 123456789012")).toBe(
+      "CAQ-20261118-123456 e 123456789012",
+    );
   });
 });
 

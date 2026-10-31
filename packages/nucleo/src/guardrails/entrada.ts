@@ -1,7 +1,8 @@
 import type { Mensagem } from "../contrato";
 import { type Cliente, clientes } from "../dados";
 
-const CPF = /\b(\d{3})\.?(\d{3})\.?(\d{3})-?(\d{2})\b/g;
+// Fronteira por dígito, não \b: "CPF12345678901" e o "\n" escapado no JSON do trace grudam letra no CPF.
+const CPF = /(?<!\d)(\d{3})[.\s]?(\d{3})[.\s]?(\d{3})[-\s]?(\d{2})(?!\d)/g;
 
 /** Regra 10: CPF sempre mascarado, no mesmo formato de clientes.json (***.***.894-**). */
 export function mascararCpf(texto: string): string {
