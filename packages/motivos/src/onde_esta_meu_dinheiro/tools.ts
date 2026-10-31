@@ -11,6 +11,7 @@ import {
   produtoPorCodigo,
   somarDiasCorridos,
   somarDiasUteis,
+  toolsDaConta,
 } from "@caqui/nucleo";
 import { tool } from "ai";
 import { z } from "zod";
@@ -156,6 +157,7 @@ export function timelineOpenUI(liquidacoes: Liquidacao[], agora: string): string
 /** `aoMontarUi` recebe a Timeline da última consulta, que vira `resposta.ui` no canal web. */
 export function criarTools(ctx: Contexto, agora: string, aoMontarUi: (ui: string | null) => void) {
   return {
+    ...toolsDaConta(ctx),
     consultarLiquidacoes: tool({
       description:
         "Histórico de liquidação das aplicações, resgates e transferências do cliente autenticado: etapas, datas e status. Sem idOperacao, traz as 10 mais recentes.",

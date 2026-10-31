@@ -107,3 +107,24 @@ describe("histórico de liquidação", () => {
     expect(await consultar(null)).toMatchObject({ liquidacoes: [], ui: null });
   });
 });
+
+describe("tools da fatia e cliente da sessão", () => {
+  it("regra 10: nenhuma tool devolve dado de outro cliente", async () => {
+    const tools = criarTools({ cliente: clientePorId("C-0002") } as Contexto, AGORA, () => {});
+    const entradas = {
+      consultarCadastro: {},
+      consultarPosicoes: {},
+      consultarExtrato: {},
+      consultarAtendimentos: { limite: 20 },
+      consultarLiquidacoes: {},
+    };
+    for (const [nome, entrada] of Object.entries(entradas)) {
+      const t = tools[nome as keyof typeof entradas];
+      const saida = JSON.stringify(await t.execute?.(entrada as never, {} as never));
+      expect(saida, nome).not.toMatch(/":\[\]|"cliente":null/);
+      expect(saida.match(/\bC-00\d{2}\b/g)?.filter((id) => id !== "C-0002") ?? [], nome).toEqual(
+        [],
+      );
+    }
+  });
+});
