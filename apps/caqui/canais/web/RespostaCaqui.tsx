@@ -2,6 +2,7 @@
 
 import type { Fonte, Handoff, Interacao, Resposta } from "@caqui/nucleo";
 import { useState } from "react";
+import { formatarRetorno } from "./momento";
 import { ROTULO_FILA } from "./openui/componentes";
 import { UiGerada } from "./openui/UiGerada";
 import css from "./RespostaCaqui.module.css";
@@ -74,7 +75,7 @@ function CartaoHandoff({ handoff }: { handoff: Handoff }) {
         <span className={css.ponto} aria-hidden />
         {handoff.humanoDisponivel
           ? "Uma pessoa continua esta conversa em instantes."
-          : `Agora não há atendimento por pessoa. Retorno previsto: ${handoff.retornoPrevisto ?? "a partir das 8h"}.`}
+          : `Agora não há atendimento por pessoa. Retorno previsto: ${handoff.retornoPrevisto ? formatarRetorno(handoff.retornoPrevisto) : "a partir das 8h"}.`}
       </p>
       <dl className={css.ficha}>
         <div>

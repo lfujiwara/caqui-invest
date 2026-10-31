@@ -40,3 +40,23 @@ export function humanoNoHorario(momento: string): boolean {
   const hora = Number(momento.slice(11, 13));
   return hora >= 8 && hora < 20;
 }
+
+const DATA_E_HORA = new Intl.DateTimeFormat("pt-BR", {
+  timeZone: "America/Sao_Paulo",
+  weekday: "short",
+  day: "2-digit",
+  month: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** `retornoPrevisto` chega do núcleo em ISO 8601 e vira "qua., 25/11 às 20h". Texto livre passa igual. */
+export function formatarRetorno(retorno: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(retorno)) return retorno;
+  const data = new Date(retorno);
+  if (Number.isNaN(data.getTime())) return retorno;
+  const p = Object.fromEntries(DATA_E_HORA.formatToParts(data).map((x) => [x.type, x.value]));
+  const minutos = p.minute === "00" ? "" : p.minute;
+  return `${p.weekday}, ${p.day}/${p.month} às ${Number(p.hour)}h${minutos}`;
+}
