@@ -195,7 +195,7 @@
 /* Estados */
 
 .digitando {
-  margin: var(--cq-e-4) 0 0;
+  margin: 0;
   width: fit-content;
   padding: var(--cq-e-3) var(--cq-e-5);
   border: 1px solid var(--cq-linha);

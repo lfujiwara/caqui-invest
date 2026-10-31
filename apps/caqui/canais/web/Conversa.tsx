@@ -139,11 +139,12 @@ export function Conversa({
                 <p className={css.balao} data-falhou={pendente.falhou || undefined}>
                   {pendente.texto}
                 </p>
-                {pendente.falhou ? (
-                  <ErroEnvio aoTentar={() => enviarTexto(pendente.texto)} />
-                ) : (
-                  <Digitando />
-                )}
+                {pendente.falhou && <ErroEnvio aoTentar={() => enviarTexto(pendente.texto)} />}
+              </li>
+            )}
+            {enviando && (
+              <li className={css.item} data-autor="caqui">
+                <Digitando />
               </li>
             )}
           </ol>
