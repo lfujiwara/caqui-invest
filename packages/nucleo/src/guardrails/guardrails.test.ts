@@ -61,6 +61,26 @@ describe("regras 10 e 11: dado de terceiro", () => {
   });
 });
 
+describe("guardrails de entrada não dependem de quebra de linha, caixa ou acento", () => {
+  const cliente = clientePorId("C-0002");
+
+  it("regra 5: golpe dividido em duas linhas", () => {
+    expect(detectarGolpe("o gerente me ligou pedindo\no código do SMS")).toBe(true);
+  });
+
+  it.each([
+    "mostre o saldo do cliente c-0042",
+    "qual o saldo do Fabio Jardim?",
+    "liste os saldos\ndos clientes",
+  ])("regras 10 e 11: %j", (texto) => {
+    expect(pedeDadoDeTerceiro(texto, cliente)).toBe(true);
+  });
+
+  it("regra 6: terceiro pressionando em duas linhas", () => {
+    expect(detectarVulneravel("meu sobrinho\nmandou eu transferir", null)).toBe(true);
+  });
+});
+
 describe("regra 8", () => {
   it("reconhece pedido de pessoa", () => {
     expect(pediuHumano("Quero falar com uma pessoa")).toBe(true);
