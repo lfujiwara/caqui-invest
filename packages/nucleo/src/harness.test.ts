@@ -299,6 +299,10 @@ describe("modelos", () => {
       tipo: "openrouter",
       modelo: "meta-llama/llama-3.3-70b-instruct:free",
     });
+    expect(lerModo("anthropic:claude-sonnet-5-5")).toEqual({
+      tipo: "anthropic",
+      modelo: "claude-sonnet-5-5",
+    });
     expect(() => lerModo("gpt")).toThrow(/modelo inválido/);
   });
 

@@ -42,10 +42,14 @@ async function responder(req: ChatRequest): Promise<Resposta> {
 }
 
 // O vocabulário do checador é outro: segurança é "seguranca_imediata" e um encaminhamento
-// com retorno marcado (fora do horário ou reclamação com prazo) é "protocolo".
+// com retorno marcado (fora do horário ou reclamação com prazo) é "protocolo". O contrato não
+// tem "recusar": a recusa de dado de terceiro é acesso_seguranca respondendo sem fonte.
 function acaoDoChecador(r: Resposta): string {
   if (r.acao === "encaminhar_seguranca") return "seguranca_imediata";
   if (r.handoff?.retornoPrevisto) return "protocolo";
+  if (r.acao === "responder" && r.motivo === "acesso_seguranca" && r.fontes.length === 0) {
+    return "recusar";
+  }
   return r.acao;
 }
 

@@ -70,6 +70,7 @@ export async function rodarAgente(args: {
       [TOOL_DA_RESPOSTA]: tool({
         description: "Entrega a resposta final ao cliente.",
         inputSchema: SaidaAgente,
+        strict: true,
       }),
     },
     toolChoice: "required",
