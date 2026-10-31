@@ -194,7 +194,7 @@
 
 .composer {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--cq-e-2);
   padding: var(--cq-e-1);
   border: 1.5px solid var(--cq-linha);
@@ -209,9 +209,8 @@
 .campo {
   flex: 1;
   min-width: 0;
-  min-height: var(--cq-alvo);
-  max-height: 10rem;
-  field-sizing: content;
+  height: var(--cq-alvo);
+  box-sizing: border-box;
   resize: none;
   padding: 13px var(--cq-e-3) 13px var(--cq-e-4);
   border: 0;

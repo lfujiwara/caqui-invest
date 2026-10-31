@@ -6,9 +6,11 @@ import { analisarUi, especificacaoOpenUI } from "./openui/biblioteca";
 const todas = Object.entries(fixtures);
 
 describe("fixtures do canal web", () => {
-  it.each(todas)("%s é uma Resposta válida pelo contrato", (_, resposta) => {
-    expect(() => Resposta.parse(resposta)).not.toThrow();
-  });
+  for (const [nome, resposta] of todas) {
+    it(`${nome} é uma Resposta válida pelo contrato`, () => {
+      expect(() => Resposta.parse(resposta)).not.toThrow();
+    });
+  }
 
   it("cobre os 8 motivos com o motivo certo", () => {
     for (const motivo of MotivoId.options) {

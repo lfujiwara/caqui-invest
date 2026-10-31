@@ -83,9 +83,15 @@
 
 .ficha div {
   display: grid;
-  grid-template-columns: 6.5rem 1fr;
-  align-items: center;
-  gap: var(--cq-e-3);
+  gap: 2px;
+}
+
+@media (min-width: 640px) {
+  .ficha div {
+    grid-template-columns: 7rem 1fr;
+    align-items: center;
+    gap: var(--cq-e-3);
+  }
 }
 
 .ficha dt {
@@ -173,6 +179,12 @@
   background: var(--cq-superficie-forte);
   color: var(--cq-tinta);
   font: var(--cq-texto-corpo-p);
+}
+
+.chipConta {
+  font: var(--cq-texto-legenda);
+  color: var(--cq-texto-suave);
+  white-space: nowrap;
 }
 
 .chipId {

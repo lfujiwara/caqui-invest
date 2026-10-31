@@ -124,7 +124,8 @@
 
 .etapaQuando {
   margin: 2px 0 0;
-  font: var(--cq-texto-numero);
+  font: 500 1.0625rem/1.4 var(--cq-fonte);
+  font-variant-numeric: tabular-nums;
   color: var(--cq-texto);
 }
 
@@ -227,8 +228,15 @@
 
 .ficha div {
   display: grid;
-  grid-template-columns: 6.5rem 1fr;
-  gap: var(--cq-e-3);
+  gap: 2px;
+}
+
+@media (min-width: 640px) {
+  .ficha div {
+    grid-template-columns: 7rem 1fr;
+    align-items: center;
+    gap: var(--cq-e-3);
+  }
 }
 
 .ficha dt {

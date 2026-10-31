@@ -125,7 +125,7 @@ export function Composer({ desabilitado, aoEnviar }: { desabilitado: boolean; ao
 export function SeletorMomento({ valor, aoMudar }: { valor: MomentoSimulado; aoMudar: (m: MomentoSimulado) => void }) {
   return (
     <label className={css.momento}>
-      Momento simulado (demo)
+      Momento (demo)
       <select value={valor} onChange={(e) => aoMudar(e.target.value as MomentoSimulado)}>
         {Object.entries(MOMENTOS_SIMULADOS).map(([id, { rotulo }]) => (
           <option key={id} value={id}>

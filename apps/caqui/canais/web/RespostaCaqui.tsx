@@ -114,7 +114,7 @@ function Fontes({ fontes }: { fontes: Fonte[] }) {
               </>
             ) : (
               <>
-                <span className={css.chipId}>Sua conta</span>
+                <span className={css.chipConta}>Dado da sua conta</span>
                 {fonte.descricao}
               </>
             )}
