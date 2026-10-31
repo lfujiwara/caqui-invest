@@ -5,7 +5,15 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { TextoWhatsApp } from "./formatacao";
 import * as Icone from "./icones";
 import { type MensagemWhatsApp, paraWhatsApp, type SecaoLista } from "./limites";
-import { DATA_SIMULADA, HORAS_DA_DEMO, horaExibida, momentoISO, msDoMomento } from "./momento";
+import {
+  DATA_SIMULADA,
+  HORAS_DA_DEMO,
+  horaExibida,
+  horaValida,
+  mascararHora,
+  momentoISO,
+  msDoMomento,
+} from "./momento";
 import { PainelCortes, type Rodada } from "./PainelCortes";
 import estilos from "./Simulador.module.css";
 
@@ -29,6 +37,7 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
   const [rascunho, setRascunho] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [relogio, setRelogio] = useState<Relogio>(() => novoRelogio(HORAS_DA_DEMO[0]));
+  const [horaDigitada, setHoraDigitada] = useState<string>(HORAS_DA_DEMO[0]);
   const [, setPulso] = useState(0);
   const [listaAberta, setListaAberta] = useState<{ botao: string; secoes: SecaoLista[] } | null>(
     null,
@@ -98,7 +107,8 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
   }
 
   function escolherHora(hora: string) {
-    if (/^\d{2}:\d{2}$/.test(hora)) setRelogio(novoRelogio(hora));
+    setHoraDigitada(hora);
+    if (horaValida(hora)) setRelogio(novoRelogio(hora));
   }
 
   const ocupado = fase !== "ocioso";
@@ -128,12 +138,18 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
                   {hora}
                 </button>
               ))}
+              {/* Texto com máscara em vez de type="time", que segue o locale e mostraria 11:00 PM. */}
               <input
-                type="time"
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={5}
+                placeholder="hh:mm"
                 className={estilos.horaLivre}
-                aria-label="Outro horário"
-                value={relogio.hora}
-                onChange={(e) => escolherHora(e.target.value)}
+                aria-label="Outro horário, de 00:00 a 23:59"
+                aria-invalid={!horaValida(horaDigitada)}
+                value={horaDigitada}
+                onChange={(e) => escolherHora(mascararHora(e.target.value))}
               />
             </fieldset>
           </div>

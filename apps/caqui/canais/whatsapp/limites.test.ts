@@ -1,4 +1,4 @@
-import { MotivoId, Resposta } from "@caqui/nucleo";
+import { analisarUi, MotivoId, Resposta } from "@caqui/nucleo";
 import { describe, expect, it } from "vitest";
 import { fixtures } from "./fixtures";
 import {
@@ -82,6 +82,14 @@ describe("fixtures", () => {
     }
   });
 
+  it("toda ui é um programa OpenUI válido da biblioteca, como o web receberia", () => {
+    const comUi = Object.entries(fixtures).flatMap(([motivo, r]): [string, string][] =>
+      r.ui ? [[motivo, r.ui]] : [],
+    );
+    expect(comUi.length).toBeGreaterThan(0);
+    for (const [motivo, ui] of comUi) expect(analisarUi(ui), motivo).toMatchObject({ ok: true });
+  });
+
   it("incluem os casos que a demo precisa mostrar", () => {
     const todas = Object.values(fixtures);
     expect(todas.some((r) => r.ui !== null)).toBe(true);
@@ -99,11 +107,11 @@ describe("ui rica", () => {
     const r = fixtures.onde_esta_meu_dinheiro;
     const msgs = paraWhatsApp(r);
     const visivel = textoVisivel(msgs);
-    expect(visivel).not.toContain("StatusResgate");
-    expect(visivel).not.toMatch(/<\/?[A-Z]/);
+    expect(visivel).not.toContain("Timeline");
+    expect(visivel).not.toContain("Painel(");
     expect(cortes(msgs)).toContainEqual({
       tipo: "ui_descartada",
-      trecho: expect.stringContaining("<StatusResgate"),
+      trecho: expect.stringContaining("root = Painel([linha])"),
     });
   });
 

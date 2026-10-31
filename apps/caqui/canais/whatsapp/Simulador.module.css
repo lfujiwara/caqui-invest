@@ -111,12 +111,19 @@
 }
 
 .horaLivre {
+  width: 7ch;
   border: 1px solid var(--borda);
   border-radius: 8px;
   padding: 4px 6px;
   font: inherit;
   font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
   background: #fff;
+}
+
+.horaLivre[aria-invalid="true"] {
+  border-color: var(--perda);
 }
 
 .momentoNota {

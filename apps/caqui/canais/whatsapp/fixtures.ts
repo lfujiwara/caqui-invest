@@ -17,7 +17,14 @@ export const fixtures: Record<MotivoId, Resposta> = {
         { id: "humano", titulo: "Falar com atendente" },
       ],
     },
-    ui: '<StatusResgate valor="12000" produto="FUNDO-RF-01"><Etapa nome="Pedido" em="2026-11-13T17:05" feita /><Etapa nome="Cotização" em="2026-11-17" feita /><Etapa nome="Pagamento" em="2026-11-18" atual /></StatusResgate>',
+    ui: [
+      "root = Painel([linha])",
+      'linha = Timeline("Resgate do Caqui Renda Fixa FIF", [e1, e2, e3, e4], "Pedido depois das 16h conta a partir do próximo dia útil.")',
+      'e1 = Etapa("Pedido de resgate", "sex, 13/11 às 17h05", "concluida")',
+      'e2 = Etapa("Dia-base", "seg, 16/11", "concluida", "Primeiro dia útil depois do pedido")',
+      'e3 = Etapa("Cotização", "ter, 17/11", "concluida", "Dia em que o valor das cotas é fixado")',
+      'e4 = Etapa("Dinheiro na conta", "qua, 18/11", "atual")',
+    ].join("\n"),
     handoff: null,
   },
 
@@ -60,7 +67,14 @@ export const fixtures: Record<MotivoId, Resposta> = {
       { tipo: "conta", descricao: "posição CDB-LD-100 e taxas de novembro" },
     ],
     interacao: null,
-    ui: '<Comparativo titulo="Novembro" series=[{nome:"CDB líquido",valor:31.93},{nome:"Poupança",valor:30.10}] />',
+    ui: [
+      "root = Painel([tabela])",
+      'tabela = TabelaIR("Imposto de renda do seu CDB", [f1, f2, f3, f4], "A poupança é isenta. Compare sempre líquido com líquido.")',
+      'f1 = FaixaIR("Até 180 dias", 22.5, true)',
+      'f2 = FaixaIR("De 181 a 360 dias", 20)',
+      'f3 = FaixaIR("De 361 a 720 dias", 17.5)',
+      'f4 = FaixaIR("Acima de 720 dias", 15)',
+    ].join("\n"),
     handoff: null,
   },
 
