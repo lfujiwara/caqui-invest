@@ -124,10 +124,15 @@ export const bibliotecaOpenUI = createLibrary({
 /** Texto que descreve a biblioteca ao modelo. O backend o anexa ao prompt do canal web. */
 export const especificacaoOpenUI: string = bibliotecaOpenUI.prompt({
   preamble:
-    "No canal web, além do texto, você pode devolver em `ui` um pequeno programa OpenUI Lang que ilustra a resposta. " +
-    "O texto continua completo sozinho: `ui` é um complemento visual. Quando nenhum componente servir, devolva `ui: null`.",
+    "No canal web, além do texto, devolva em `ui` um pequeno programa OpenUI Lang que ilustra a resposta. " +
+    "O cliente entende melhor vendo: sempre que a resposta tiver datas, prazos, etapas, valores, rendimento, imposto ou protocolo, monte a `ui`. " +
+    "Na dúvida, monte. Omita `ui` só quando a resposta não tiver nenhum dado que caiba num componente. " +
+    "O texto continua completo sozinho: `ui` é um complemento visual, não um substituto.",
   additionalRules: [
     "Use apenas os componentes listados. Qualquer outro é descartado sem aviso ao cliente.",
+    "Prazo de resgate, aplicação, liquidação ou transferência: Timeline. Rendimento de dois ou mais produtos: Comparativo. Imposto de renda da renda fixa: TabelaIR. Protocolo de atendimento: CartaoProtocolo.",
+    "Combine blocos quando a resposta tiver mais de um desses assuntos, até três no Painel.",
+    "O programa vai só no campo `ui`. Nunca escreva código OpenUI no `texto`: o cliente leria o código cru.",
     "A raiz é sempre Painel([...]), com de um a três blocos.",
     "Datas, prazos, taxas e valores vêm do núcleo e da base de conhecimento. Nunca invente um número.",
     "Comparativo compara sempre valores líquidos, depois do imposto. Nunca marque um produto como melhor nem sugira qual escolher.",

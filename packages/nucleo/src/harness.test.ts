@@ -362,4 +362,51 @@ describe("modelos", () => {
       "texto",
     ]);
   });
+
+  it("no web, o prompt traz a biblioteca OpenUI e a ui do modelo vai na resposta", async () => {
+    const modeloQueDesenha = () =>
+      new MockLanguageModelV4({
+        doGenerate: async () => ({
+          content: [
+            {
+              type: "tool-call",
+              toolCallId: "1",
+              toolName: TOOL_DA_RESPOSTA,
+              input: JSON.stringify({
+                texto: "Seu protocolo está em análise.",
+                kbs: [],
+                ui: UI_VALIDA,
+              }),
+            },
+          ],
+          finishReason: { unified: "tool-calls", raw: undefined },
+          usage: {
+            inputTokens: { total: 0, noCache: 0, cacheRead: undefined, cacheWrite: undefined },
+            outputTokens: { total: 0, text: 0, reasoning: undefined },
+          },
+          warnings: [],
+        }),
+      });
+    const rodar = (canal: ChatRequest["canal"]) => {
+      const modelo = modeloQueDesenha();
+      const resposta = rodarAgente({
+        motivo: "outros",
+        skill: "",
+        kbs: [],
+        tools: {},
+        req: req("E meu protocolo?", { canal }),
+        modelo,
+      });
+      return { modelo, resposta };
+    };
+    const prompt = (m: MockLanguageModelV4) => JSON.stringify(m.doGenerateCalls[0]?.prompt);
+
+    const web = rodar("web");
+    expect((await web.resposta).ui).toBe(UI_VALIDA);
+    expect(prompt(web.modelo)).toContain("Na dúvida, monte.");
+
+    const whatsapp = rodar("whatsapp");
+    await whatsapp.resposta;
+    expect(prompt(whatsapp.modelo)).not.toContain("OpenUI");
+  });
 });

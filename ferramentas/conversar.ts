@@ -100,6 +100,7 @@ async function turno(mensagem: string) {
     console.log(cinza(`  fonte: ${f.tipo === "kb" ? `${f.id} ${f.titulo}` : f.descricao}`));
   if (r.interacao) console.log(cinza(`  interação: ${curto(r.interacao)}`));
   if (r.handoff) console.log(cinza(`  handoff: ${curto(r.handoff)}`));
+  if (r.ui) console.log(cinza(`  ui:\n${r.ui.replace(/^/gm, "    ")}`));
   console.log();
 }
 
