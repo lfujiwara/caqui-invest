@@ -9,9 +9,10 @@ export const MOTIVO: Motivo = {
     "O que é liquidez diária?",
     "Esse CDB tem garantia?",
     "Vocês têm previdência privada?",
+    "E no sábado?",
   ],
   gatilhos:
-    /o que (é|e|significa)|como funciona|garantia|\bfgc\b|\bcdb\b|\blci\b|\blca\b|tesouro|fundo|a[cç](ão|ões|oes)|liquidez|previd[eê]ncia|cripto|car[eê]ncia|voc[eê]s (t[eê]m|oferecem)|\bcdi\b/i,
+    /o que (é|e|significa)|como funciona|garantia|\bfgc\b|\bcdb\b|\blci\b|\blca\b|tesouro|fundo|a[cç](ão|ões|oes)|liquidez|previd[eê]ncia|cripto|car[eê]ncia|voc[eê]s (t[eê]m|oferecem)|\bcdi\b|s[aá]bado|domingo|feriado|fim de semana/i,
   regras: [9],
   kbs: KBS,
   guardrails: GUARDRAILS_DE_FATIA_COM_LLM,
