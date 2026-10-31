@@ -31,7 +31,7 @@ type Conteudo = { id: string } & (
 );
 type Item = Conteudo & { comCauda: boolean };
 
-export function Simulador({ enviar }: { enviar: Enviar }) {
+export function Simulador({ enviar, idCliente }: { enviar: Enviar; idCliente: string | null }) {
   const [historico, setHistorico] = useState<Mensagem[]>([]);
   const [fase, setFase] = useState<Fase>("ocioso");
   const [rascunho, setRascunho] = useState("");
@@ -81,7 +81,7 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
     const digitando = setTimeout(() => setFase("digitando"), ESPERA_ENTREGUE_MS);
     try {
       const [resposta] = await Promise.all([
-        enviar({ canal: "whatsapp", mensagem, historico: anterior, idCliente: null, momento: em }),
+        enviar({ canal: "whatsapp", mensagem, historico: anterior, idCliente, momento: em }),
         new Promise((pronto) =>
           setTimeout(pronto, ESPERA_ENTREGUE_MS + ESPERA_MINIMA_DIGITANDO_MS),
         ),
