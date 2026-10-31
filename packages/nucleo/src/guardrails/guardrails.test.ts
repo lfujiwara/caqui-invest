@@ -10,7 +10,8 @@ import {
   pediuHumano,
   respostasSemEntender,
 } from "./entrada";
-import { adaptarAoCanal, verificarFontes } from "./saida";
+import { TEXTO_SEM_RECOMENDACAO } from "./por_motivo";
+import { adaptarAoCanal, pedeSenha, recomenda, verificarFontes } from "./saida";
 
 describe("regra 10: CPF mascarado", () => {
   it.each(["123.456.789-01", "12345678901", "123 456 789-01"])("%s", (cpf) => {
@@ -200,5 +201,39 @@ describe("guardrails de saída", () => {
     for (const ui of ["<Cartao />", 'root = Painel([t])\nt = Timeline("x", [e1])']) {
       expect(adaptarAoCanal({ ...resposta("Oi", []), ui }, "web").ui).toBeNull();
     }
+  });
+});
+
+describe("detectores de saída", () => {
+  it.each([
+    "Me passe o código que chegou por SMS.",
+    "Digite sua senha aqui para confirmar.",
+    "Informe o token do aplicativo.",
+  ])("regra 10, pede: %s", (texto) => {
+    expect(pedeSenha(texto)).toBe(true);
+  });
+
+  it.each([
+    "Pare agora: não passe nenhum código, senha ou valor.",
+    "Não passe o código para ninguém.",
+    "A Caqui nunca pede senha nem código.",
+  ])("regra 10, orienta: %s", (texto) => {
+    expect(pedeSenha(texto)).toBe(false);
+  });
+
+  it.each([
+    "Recomendo o CDB de liquidez diária.",
+    "Eu investiria no fundo de renda fixa.",
+    "A melhor opção para você é o Tesouro Selic.",
+  ])("regra 4, indica: %s", (texto) => {
+    expect(recomenda(texto)).toBe(true);
+  });
+
+  it.each([
+    TEXTO_SEM_RECOMENDACAO,
+    "A melhor forma de comparar é sempre líquido com líquido.",
+    "O CDB tem garantia do FGC, dentro dos limites.",
+  ])("regra 4, explica: %s", (texto) => {
+    expect(recomenda(texto)).toBe(false);
   });
 });

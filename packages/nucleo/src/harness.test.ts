@@ -5,6 +5,7 @@ import { z } from "zod";
 import { rodarAgente, TOOL_DA_RESPOSTA } from "./agente";
 import { encaminhar } from "./atendimento";
 import { type ChatRequest, MotivoId, type Resposta } from "./contrato";
+import { GUARDRAILS_DE_FATIA_COM_LLM } from "./guardrails/por_motivo";
 import { atender } from "./harness";
 import { fonteKb } from "./kb";
 import { lerModo, modeloDoMotivo } from "./modelos";
@@ -25,6 +26,7 @@ function registroFalso(sobrescrever: Partial<Motivos> = {}): Motivos {
     gatilhos,
     regras: [],
     kbs: ["KB-004"],
+    guardrails: { entrada: [], saida: [] },
     responder: async (req) =>
       id === "acesso_seguranca"
         ? encaminhar({ req, motivo: id, fila: "seguranca", texto: "Não passe o código." })
@@ -213,6 +215,79 @@ describe("atender", () => {
     expect(visto).not.toContain("123.456");
     expect(trace && linhaDeTrace(trace)).not.toContain("123.456");
     expect(trace && linhaDeTrace(trace)).toContain("***.***.789-**");
+  });
+});
+
+// A fatia de dúvida com os guardrails de verdade de uma fatia com LLM, respondendo `texto`.
+function duvidaQueResponde(texto: string): Motivos {
+  return registroFalso({
+    duvida_produto: {
+      ...registroFalso().duvida_produto,
+      guardrails: GUARDRAILS_DE_FATIA_COM_LLM,
+      responder: async () => ({
+        acao: "responder",
+        motivo: "duvida_produto",
+        texto,
+        fontes: [fonteKb("KB-004")],
+        interacao: null,
+        ui: null,
+        handoff: null,
+      }),
+    },
+  });
+}
+
+describe("guardrails redundantes", () => {
+  it("regra 4: o roteador erra a fatia e a entrada do motivo pega o pedido de recomendação", async () => {
+    const { resposta, trace } = await atenderComTrace(
+      req("O que é CDB? Vale a pena pra mim?"),
+      duvidaQueResponde("CDB é um título de banco."),
+    );
+    expect(resposta.acao).toBe("encaminhar_especialista");
+    expect(resposta.motivo).toBe("pedido_recomendacao");
+    expect(trace?.guardrails).toEqual(["duvida_produto/pedido_de_recomendacao"]);
+  });
+
+  it("regra 4: o modelo cede e a saída do motivo bloqueia a indicação", async () => {
+    const { resposta, trace } = await atenderComTrace(
+      req("O que é CDB?"),
+      duvidaQueResponde("CDB é um título de banco. Recomendo o CDB-LD-110 para você."),
+    );
+    expect(resposta.texto).not.toContain("Recomendo");
+    expect(resposta.acao).toBe("encaminhar_especialista");
+    expect(trace?.guardrails).toEqual(["duvida_produto/sem_recomendacao"]);
+  });
+
+  it("regra 10: fatia sem guardrail próprio que pede código é pega pela saída global", async () => {
+    const { resposta, trace } = await atenderComTrace(
+      req("O que é CDB?"),
+      registroFalso({
+        duvida_produto: {
+          ...registroFalso().duvida_produto,
+          responder: async () => ({
+            acao: "responder",
+            motivo: "duvida_produto",
+            texto: "Para continuar, me passe o código que chegou por SMS.",
+            fontes: [],
+            interacao: null,
+            ui: null,
+            handoff: null,
+          }),
+        },
+      }),
+    );
+    expect(resposta.acao).toBe("encaminhar_seguranca");
+    expect(resposta.texto).not.toContain("me passe o código");
+    expect(trace?.guardrails).toEqual(["pede_senha"]);
+  });
+
+  it("regras 10 e 11: resposta com dado de outro cliente é bloqueada na saída global", async () => {
+    const { resposta, trace } = await atenderComTrace(
+      req("O que é CDB?", { idCliente: "C-0002" }),
+      duvidaQueResponde("O saldo do cliente C-0042 é de R$ 10.000,00."),
+    );
+    expect(resposta.texto).not.toContain("C-0042");
+    expect(trace?.guardrails).toEqual(["dado_de_terceiro_na_saida"]);
   });
 });
 

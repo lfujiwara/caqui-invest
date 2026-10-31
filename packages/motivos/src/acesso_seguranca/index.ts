@@ -7,6 +7,7 @@ import {
   type Motivo,
   pedeDadoDeTerceiro,
   type Resposta,
+  SEM_GUARDRAILS_PROPRIOS,
 } from "@caqui/nucleo";
 
 const responder = (texto: string, fontes: Resposta["fontes"]): Resposta => ({
@@ -94,5 +95,6 @@ export const MOTIVO: Motivo = {
     /senha|golpe|bloque|\bacess(o|ar)\b|\blogin\b|aparelho|celular novo|biometria|invadi|hacke|\bcpf\b|\bc[oó]digo\b|\bsms\b/i,
   regras: [5, 10, 11],
   kbs: ["KB-019", "KB-020", "KB-021"],
+  guardrails: SEM_GUARDRAILS_PROPRIOS,
   responder: atender,
 };
