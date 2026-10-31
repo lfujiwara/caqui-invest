@@ -19,3 +19,8 @@ dist/
 build/
 .venv/
 __pycache__/
+
+# next.js e typescript
+.next/
+next-env.d.ts
+*.tsbuildinfo

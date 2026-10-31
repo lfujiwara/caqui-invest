@@ -1,0 +1,22 @@
+{
+  "name": "caqui-invest",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "pnpm --filter caqui dev",
+    "build": "pnpm --filter caqui build",
+    "start": "pnpm --filter caqui start",
+    "check": "biome check . && pnpm -r --if-present typecheck && depcruise . --config .dependency-cruiser.cjs",
+    "test": "vitest run",
+    "eval": "pnpm --filter @caqui/ferramentas avaliar"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.4",
+    "dependency-cruiser": "18.7.0",
+    "typescript": "5.9.3",
+    "vitest": "5.0.5"
+  }
+}
