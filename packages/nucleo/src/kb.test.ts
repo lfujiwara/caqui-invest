@@ -25,7 +25,8 @@ describe("buscarKb", () => {
     );
   });
 
-  it("devolve vazio quando nada casa", () => {
+  it("devolve vazio quando nada casa, mesmo com palavras comuns", () => {
     expect(buscarKb("asdf", todos)).toEqual([]);
+    expect(buscarKb("não é isso", todos)).toEqual([]);
   });
 });

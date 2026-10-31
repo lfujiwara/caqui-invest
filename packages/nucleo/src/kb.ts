@@ -44,12 +44,19 @@ const normalizar = (s: string) =>
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "");
 
+// Palavras que aparecem em qualquer pergunta e não dizem nada sobre o assunto.
+const VAZIAS = new Set(
+  "nao sim que com para por uma uns umas isso esse essa este esta meu minha seu sua voce voces tem ter qual quando como onde mais menos foi ser sao dos das nos nas ate ja".split(
+    " ",
+  ),
+);
+
 // Radical de 5 letras: "resgate"/"resgatei" e "cripto"/"criptomoedas" casam sem um stemmer.
 const termos = (s: string) =>
   new Set(
     normalizar(s)
       .split(/[^a-z0-9]+/)
-      .filter((t) => t.length >= 3)
+      .filter((t) => t.length >= 3 && !VAZIAS.has(t))
       .map((t) => t.slice(0, 5)),
   );
 
