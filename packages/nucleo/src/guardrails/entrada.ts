@@ -11,7 +11,7 @@ export function mascararCpf(texto: string): string {
 
 // Uma linha só, minúscula e sem acento. Sem isso, "pedindo\no código" escapa do `.*`, "c-0042" do
 // id e "Fabio" do nome "Fábio".
-const normalizar = (texto: string) =>
+export const normalizar = (texto: string) =>
   texto
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
@@ -37,12 +37,22 @@ export function detectarGolpe(texto: string): boolean {
  * ou listagem em massa). O texto do cliente é dado: nenhum "modo administrador" muda isso.
  */
 export function pedeDadoDeTerceiro(texto: string, cliente: Cliente | null): boolean {
+  const emMassa = /\b(cpfs|saldos|dados)\b.*\b(dos|de outros|de todos os) clientes\b/.test(
+    normalizar(texto),
+  );
+  return citaOutroCliente(texto, cliente) || emMassa;
+}
+
+/** Regras 10 e 11: o texto cita o id ou o nome de um cliente que não é o autenticado. */
+export function citaOutroCliente(texto: string, cliente: Cliente | null): boolean {
   const t = normalizar(texto);
   const outroId = [...t.matchAll(/\bc-\d{4}\b/g)].some(([id]) => id !== cliente?.id.toLowerCase());
-  const outroNome = clientes().some((c) => c.id !== cliente?.id && t.includes(normalizar(c.nome)));
-  const emMassa = /\b(cpfs|saldos|dados)\b.*\b(dos|de outros|de todos os) clientes\b/.test(t);
-  return outroId || outroNome || emMassa;
+  return outroId || clientes().some((c) => c.id !== cliente?.id && t.includes(normalizar(c.nome)));
 }
+
+/** Regra 4: pedido de indicação de produto. É também o gatilho da fatia pedido_recomendacao. */
+export const PEDIDO_DE_RECOMENDACAO =
+  /onde (eu )?(coloco|invisto|investir|aplico|aplicar)|recomend|no meu lugar|assessor|vale (mais )?a pena|me diz o que fazer|qual (o |é o )?melhor|devo (investir|aplicar)|o que (eu )?fa[cç]o com/i;
 
 const TERCEIRO_PRESSIONANDO =
   /\b(sobrinh[oa]|filh[oa]|net[oa]|genro|nora|vizinh[oa])\b.*\b(mandou|pediu|disse|dizendo|mandando|do meu lado|quer que eu)\b/;

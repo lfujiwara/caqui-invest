@@ -1,4 +1,4 @@
-import type { Motivo } from "@caqui/nucleo";
+import { type Motivo, pedidoDeRecomendacao, semEntender, semRecomendacao } from "@caqui/nucleo";
 import { KBS, responder } from "./agente";
 
 export const MOTIVO: Motivo = {
@@ -14,5 +14,6 @@ export const MOTIVO: Motivo = {
     /endere[cç]o|telefone|e-?mail|cadastr|parceria|varejista|\bloja\b|tarifa|mudar (meu|o) nome/i,
   regras: [8],
   kbs: KBS,
+  guardrails: { entrada: [pedidoDeRecomendacao, semEntender], saida: [semRecomendacao] },
   responder,
 };

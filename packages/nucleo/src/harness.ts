@@ -1,17 +1,10 @@
 import { encaminhar, KBS_DO_ENCAMINHAMENTO } from "./atendimento";
 import { type ChatRequest, type Mensagem, type MotivoId, Resposta } from "./contrato";
 import { clientePorId } from "./dados";
-import {
-  detectarGolpe,
-  detectarVulneravel,
-  excedeuPassos,
-  mascararCpf,
-  pedeDadoDeTerceiro,
-  pediuHumano,
-  respostasSemEntender,
-} from "./guardrails/entrada";
-import { adaptarAoCanal, verificarFontes } from "./guardrails/saida";
-import { fonteKb } from "./kb";
+import { type Encaminhamento, primeiroQueDispara } from "./guardrails/camadas";
+import { mascararCpf } from "./guardrails/entrada";
+import { GLOBAIS_ENTRADA, GLOBAIS_SAIDA } from "./guardrails/globais";
+import { adaptarAoCanal } from "./guardrails/saida";
 import { modeloDoMotivo, modeloDoRoteador } from "./modelos";
 import type { Motivos } from "./motivo";
 import { rotear } from "./roteador";
@@ -21,13 +14,10 @@ function mascararHistorico(historico: readonly Mensagem[]): Mensagem[] {
   return historico.map((m) => (m.autor === "cliente" ? { ...m, texto: mascararCpf(m.texto) } : m));
 }
 
-const ultimoMotivo = (historico: readonly Mensagem[]): MotivoId =>
-  historico.findLast((m) => m.autor === "caqui")?.resposta.motivo ?? "outros";
-
 /**
- * Pipeline do atendimento: guardrails de entrada, roteador, fatia, guardrails de saída,
- * adaptação ao canal e trace. O registro de motivos chega por parâmetro: o núcleo não
- * conhece nenhuma fatia.
+ * Pipeline do atendimento, em duas camadas de guardrails: global de entrada, roteador, entrada
+ * do motivo, fatia, saída do motivo, global de saída, adaptação ao canal e trace. O registro de
+ * motivos chega por parâmetro: o núcleo não conhece nenhuma fatia.
  */
 export async function atender(
   entrada: ChatRequest,
@@ -42,23 +32,40 @@ export async function atender(
   const cliente = clientePorId(req.idCliente);
   const guardrails: string[] = [];
   let erro: string | null = null;
+  const anotarErro = (e: unknown) => {
+    erro = e instanceof Error ? e.message : String(e);
+  };
+
+  let rota: Promise<MotivoId> | undefined;
+  const rotaDaMensagem = () => {
+    // Async para que o erro síncrono de modeloDoRoteador (chave ausente) também caia no catch.
+    rota ??= (async () => rotear(req.mensagem, motivos, modeloDoRoteador()))().catch(
+      (e: unknown) => {
+        // Provedor fora ou com limite de uso (comum em modelo gratuito): o cliente segue atendido.
+        anotarErro(e);
+        guardrails.push("roteador_por_gatilhos");
+        return rotear(req.mensagem, motivos, { tipo: "gatilhos" });
+      },
+    );
+    return rota;
+  };
+
+  const encaminharPor = (e: Encaminhamento, motivo: MotivoId): Resposta =>
+    encaminhar({ req, motivo: e.motivo ?? motivo, fila: e.fila, texto: e.texto, fontes: e.fontes });
 
   const daFatia = async (id: MotivoId): Promise<Resposta> => {
     const motivo = motivos[id];
+    const ctx = { req, cliente, kbs: [...motivo.kbs, ...KBS_DO_ENCAMINHAMENTO] };
+    const naEntrada = primeiroQueDispara(motivo.guardrails.entrada, (g) => g.checar(ctx));
+    if (naEntrada) {
+      guardrails.push(`${id}/${naEntrada.id}`);
+      return encaminharPor(naEntrada.veredito, id);
+    }
+    let resposta: Resposta;
     try {
-      const resposta = await motivo.responder(req, { cliente, modelo: modeloDoMotivo(motivo.kbs) });
-      const bloqueio = verificarFontes(resposta, [...motivo.kbs, ...KBS_DO_ENCAMINHAMENTO]);
-      if (!bloqueio) return resposta;
-      guardrails.push(bloqueio);
-      return encaminhar({
-        req,
-        motivo: id,
-        fila: "atendimento",
-        texto:
-          "Não encontrei uma fonte confiável para responder isso com segurança, então prefiro não arriscar.",
-      });
+      resposta = await motivo.responder(req, { cliente, modelo: modeloDoMotivo(motivo.kbs) });
     } catch (e) {
-      erro = e instanceof Error ? e.message : String(e);
+      anotarErro(e);
       return encaminhar({
         req,
         motivo: id,
@@ -66,65 +73,26 @@ export async function atender(
         texto: "Tive um problema para responder agora.",
       });
     }
+    const daFatiaNaSaida = primeiroQueDispara(motivo.guardrails.saida, (g) =>
+      g.checar(resposta, ctx),
+    );
+    const naSaida = daFatiaNaSaida
+      ? { ...daFatiaNaSaida, id: `${id}/${daFatiaNaSaida.id}` }
+      : primeiroQueDispara(GLOBAIS_SAIDA, (g) => g.checar(resposta, ctx));
+    if (!naSaida) return resposta;
+    guardrails.push(naSaida.id);
+    return encaminharPor(naSaida.veredito, id);
   };
 
   const decidir = async (): Promise<Resposta> => {
-    if (detectarGolpe(req.mensagem)) {
-      guardrails.push("golpe");
-      return daFatia("acesso_seguranca");
-    }
-    if (pedeDadoDeTerceiro(req.mensagem, cliente)) {
-      guardrails.push("dado_de_terceiro");
-      return daFatia("acesso_seguranca");
-    }
-    if (pediuHumano(req.mensagem)) {
-      guardrails.push("pediu_humano");
-      return encaminhar({
-        req,
-        motivo: ultimoMotivo(req.historico),
-        fila: "atendimento",
-        texto: "Claro, vou te passar para uma pessoa.",
-      });
-    }
-    if (excedeuPassos(req.historico)) {
-      guardrails.push("limite_de_passos");
-      return encaminhar({
-        req,
-        motivo: ultimoMotivo(req.historico),
-        fila: "atendimento",
-        texto: "Para não te deixar dando voltas, vou te passar para uma pessoa.",
-      });
-    }
-    const vulneravel = detectarVulneravel(req.mensagem, cliente);
-    const rota = await (async () => rotear(req.mensagem, motivos, modeloDoRoteador()))().catch(
-      (e: unknown) => {
-        // Provedor fora ou com limite de uso (comum em modelo gratuito): o cliente segue atendido.
-        erro = e instanceof Error ? e.message : String(e);
-        guardrails.push("roteador_por_gatilhos");
-        return rotear(req.mensagem, motivos, { tipo: "gatilhos" });
-      },
+    const global = primeiroQueDispara(GLOBAIS_ENTRADA, (g) =>
+      g.checar({ req, cliente, kbs: KBS_DO_ENCAMINHAMENTO }),
     );
-    if (vulneravel) {
-      guardrails.push("cliente_vulneravel");
-      return encaminhar({
-        req,
-        motivo: rota,
-        fila: "atendimento",
-        texto:
-          "Quero te ajudar com calma. Para decidir sobre o seu dinheiro, você fala agora com uma pessoa do nosso time de atendentes, com prioridade. Não precisa decidir nada com pressa. Lembre: a Caqui só transfere para conta de mesma titularidade, nunca para a conta de outra pessoa.",
-        fontes: [fonteKb("KB-028"), fonteKb("KB-018")],
-      });
-    }
-    if (rota === "outros" && respostasSemEntender(req.historico) >= 2) {
-      guardrails.push("sem_entender");
-      return encaminhar({
-        req,
-        motivo: "outros",
-        fila: "atendimento",
-        texto: "Ainda não consegui entender o que você precisa. Vou te passar para uma pessoa.",
-      });
-    }
-    return daFatia(rota);
+    if (!global) return daFatia(await rotaDaMensagem());
+    guardrails.push(global.id);
+    const v = global.veredito;
+    if (v.tipo === "desviar") return daFatia(v.motivo);
+    return encaminharPor(v, v.motivo ?? (await rotaDaMensagem()));
   };
 
   const decidida = await decidir();
