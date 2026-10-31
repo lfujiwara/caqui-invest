@@ -83,4 +83,9 @@ describe("ChatRequest", () => {
   it("aceita o formato curto de momento usado em perguntas_teste.jsonl", () => {
     expect(ChatRequest.safeParse({ ...req, momento: "2026-10-31T10:00-03:00" }).success).toBe(true);
   });
+
+  it("recusa mensagem acima do limite de texto do WhatsApp", () => {
+    expect(ChatRequest.safeParse({ ...req, mensagem: "a".repeat(4096) }).success).toBe(true);
+    expect(ChatRequest.safeParse({ ...req, mensagem: "a".repeat(4097) }).success).toBe(false);
+  });
 });
