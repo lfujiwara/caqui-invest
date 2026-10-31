@@ -2,8 +2,9 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { z } from "zod";
 
-// Sobe a partir do cwd até achar dados/. Funciona no dev (apps/caqui), nos testes,
-// no build standalone (que copia dados/ para a raiz do bundle) e no Docker.
+// Sobe a partir do cwd até achar dados/. Funciona no dev (apps/caqui), nos testes, no build
+// standalone (que copia dados/ para a raiz do bundle) e no Docker. O turbopackIgnore abaixo evita
+// que o Next trace o repo inteiro; next.config.ts inclui dados/ e as skills explicitamente.
 function acharRaiz(): string {
   const doAmbiente = process.env.CAQUI_RAIZ;
   if (doAmbiente) return doAmbiente;
@@ -20,12 +21,12 @@ let raiz: string | undefined;
 
 export function lerDoRepo(caminho: string): string {
   raiz ??= acharRaiz();
-  return readFileSync(join(raiz, caminho), "utf8");
+  return readFileSync(join(/*turbopackIgnore: true*/ raiz, caminho), "utf8");
 }
 
 function listarDoRepo(pasta: string): string[] {
   raiz ??= acharRaiz();
-  return readdirSync(join(raiz, pasta));
+  return readdirSync(join(/*turbopackIgnore: true*/ raiz, pasta));
 }
 
 function lerCsv(caminho: string): Record<string, string>[] {
