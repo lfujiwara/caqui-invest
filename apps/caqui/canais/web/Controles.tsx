@@ -76,11 +76,6 @@ export function Vazio({ aoEscolher }: { aoEscolher: (texto: string) => void }) {
 export function Digitando() {
   return (
     <p className={css.digitando} role="status">
-      <span className={css.pontos} aria-hidden>
-        <i />
-        <i />
-        <i />
-      </span>
       Escrevendo a resposta…
     </p>
   );
