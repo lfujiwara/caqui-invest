@@ -12,7 +12,7 @@ import {
 import { adaptarAoCanal, verificarFontes } from "./saida";
 
 describe("regra 10: CPF mascarado", () => {
-  it.each(["123.456.789-01", "12345678901"])("%s", (cpf) => {
+  it.each(["123.456.789-01", "12345678901", "123 456 789 01", "123 456 789-01"])("%s", (cpf) => {
     const t = mascararCpf(`meu cpf é ${cpf}, confere?`);
     expect(t).toBe("meu cpf é ***.***.789-**, confere?");
   });
@@ -23,6 +23,14 @@ describe("regra 5: golpe", () => {
 
   it.each(golpes.map((p) => [p.id, p.pergunta]))("%s detecta: %s", (_, pergunta) => {
     expect(detectarGolpe(pergunta)).toBe(true);
+  });
+
+  it.each([
+    "Chegou um código por SMS.\nO moço que ligou da Caqui pediu pra eu passar. Posso?",
+    "Me ligaram da Caqui e pediram as senhas do app",
+    "Pediram os códigos que chegaram no meu celular",
+  ])("detecta: %s", (mensagem) => {
+    expect(detectarGolpe(mensagem)).toBe(true);
   });
 
   it("não dispara nas outras perguntas de teste", () => {
@@ -37,6 +45,12 @@ describe("regra 6: cliente vulnerável", () => {
   it.each(["PT-22", "PT-23", "PT-24"])("%s", (id) => {
     const p = perguntaDeTeste(id);
     expect(detectarVulneravel(p.pergunta, clientePorId(p.contexto.id_cliente ?? null))).toBe(true);
+  });
+
+  it("terceiro pressionando em outra linha", () => {
+    expect(detectarVulneravel("Meu sobrinho está aqui.\nEle mandou eu resgatar tudo", null)).toBe(
+      true,
+    );
   });
 
   it("a mesma confusão vinda de cliente jovem não é tratada como vulnerável", () => {

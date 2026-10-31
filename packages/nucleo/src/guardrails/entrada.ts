@@ -1,16 +1,20 @@
 import type { Mensagem } from "../contrato";
 import { type Cliente, clientes } from "../dados";
 
-const CPF = /\b(\d{3})\.?(\d{3})\.?(\d{3})-?(\d{2})\b/g;
+const CPF = /\b(\d{3})[.\s]?(\d{3})[.\s]?(\d{3})[-\s]?(\d{2})\b/g;
 
 /** Regra 10: CPF sempre mascarado, no mesmo formato de clientes.json (***.***.894-**). */
 export function mascararCpf(texto: string): string {
   return texto.replace(CPF, (_, _a, _b, c) => `***.***.${c}-**`);
 }
 
+// O `.` das regex não cruza quebra de linha, e mensagem de WhatsApp costuma vir em várias.
+const normalizar = (texto: string): string =>
+  texto.normalize("NFC").toLowerCase().replace(/\s+/g, " ");
+
 const SINAIS_DE_GOLPE = [
-  /\b(c[oó]digo|sms|token|senha)\b.*\b(pediu|pedindo|pediram|passar|mandar|confirmar)\b/,
-  /\b(pediu|pedindo|pediram|passar|mandar)\b.*\b(c[oó]digo|sms|token|senha)\b/,
+  /\b(c[oó]digos?|sms|tokens?|senhas?)\b.*\b(pediu|pedindo|pediram|passar|mandar|confirmar)\b/,
+  /\b(pediu|pedindo|pediram|passar|mandar)\b.*\b(c[oó]digos?|sms|tokens?|senhas?)\b/,
   /\b(suporte|acesso) remoto\b|\banydesk\b|\bteamviewer\b/,
   /\bpix de teste\b|\b(transfer[eê]ncia|pix)\b.*\bpra n[aã]o bloquear\b/,
   /\bgerente\b.*\b(ligou|liga[cç][aã]o)\b.*\b(c[oó]digo|senha|transfer)/,
@@ -18,7 +22,7 @@ const SINAIS_DE_GOLPE = [
 
 /** Regra 5: sinal de golpe em qualquer ponto da mensagem, mesmo no meio de outra pergunta. */
 export function detectarGolpe(texto: string): boolean {
-  const t = texto.toLowerCase();
+  const t = normalizar(texto);
   return SINAIS_DE_GOLPE.some((r) => r.test(t));
 }
 
@@ -27,7 +31,7 @@ export function detectarGolpe(texto: string): boolean {
  * ou listagem em massa). O texto do cliente é dado: nenhum "modo administrador" muda isso.
  */
 export function pedeDadoDeTerceiro(texto: string, cliente: Cliente | null): boolean {
-  const t = texto.toLowerCase();
+  const t = normalizar(texto);
   const outroId = [...texto.matchAll(/\bC-\d{4}\b/g)].some(([id]) => id !== cliente?.id);
   const outroNome = clientes().some(
     (c) => c.id !== cliente?.id && t.includes(c.nome.toLowerCase()),
@@ -44,7 +48,7 @@ const RESGATE_TOTAL =
 
 /** Regra 6: terceiro pressionando, ou pessoa idosa confusa ou pedindo resgate total. */
 export function detectarVulneravel(texto: string, cliente: Cliente | null): boolean {
-  const t = texto.toLowerCase();
+  const t = normalizar(texto);
   if (TERCEIRO_PRESSIONANDO.test(t)) return true;
   const idosa = (cliente?.idade ?? 0) >= 60;
   return idosa && (CONFUSAO.test(t) || RESGATE_TOTAL.test(t));
