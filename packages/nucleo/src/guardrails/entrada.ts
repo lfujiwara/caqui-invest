@@ -1,12 +1,22 @@
 import type { Mensagem } from "../contrato";
 import { type Cliente, clientes } from "../dados";
 
-const CPF = /\b(\d{3})\.?(\d{3})\.?(\d{3})-?(\d{2})\b/g;
+// Fronteira por dígito, não \b: "CPF12345678901" e o "\n" escapado no JSON do trace grudam letra no CPF.
+const CPF = /(?<!\d)(\d{3})[.\s]?(\d{3})[.\s]?(\d{3})[-\s]?(\d{2})(?!\d)/g;
 
 /** Regra 10: CPF sempre mascarado, no mesmo formato de clientes.json (***.***.894-**). */
 export function mascararCpf(texto: string): string {
   return texto.replace(CPF, (_, _a, _b, c) => `***.***.${c}-**`);
 }
+
+// Uma linha só, minúscula e sem acento. Sem isso, "pedindo\no código" escapa do `.*`, "c-0042" do
+// id e "Fabio" do nome "Fábio".
+const normalizar = (texto: string) =>
+  texto
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ");
 
 const SINAIS_DE_GOLPE = [
   /\b(c[oó]digo|sms|token|senha)\b.*\b(pediu|pedindo|pediram|passar|mandar|confirmar)\b/,
@@ -18,7 +28,7 @@ const SINAIS_DE_GOLPE = [
 
 /** Regra 5: sinal de golpe em qualquer ponto da mensagem, mesmo no meio de outra pergunta. */
 export function detectarGolpe(texto: string): boolean {
-  const t = texto.toLowerCase();
+  const t = normalizar(texto);
   return SINAIS_DE_GOLPE.some((r) => r.test(t));
 }
 
@@ -27,11 +37,9 @@ export function detectarGolpe(texto: string): boolean {
  * ou listagem em massa). O texto do cliente é dado: nenhum "modo administrador" muda isso.
  */
 export function pedeDadoDeTerceiro(texto: string, cliente: Cliente | null): boolean {
-  const t = texto.toLowerCase();
-  const outroId = [...texto.matchAll(/\bC-\d{4}\b/g)].some(([id]) => id !== cliente?.id);
-  const outroNome = clientes().some(
-    (c) => c.id !== cliente?.id && t.includes(c.nome.toLowerCase()),
-  );
+  const t = normalizar(texto);
+  const outroId = [...t.matchAll(/\bc-\d{4}\b/g)].some(([id]) => id !== cliente?.id.toLowerCase());
+  const outroNome = clientes().some((c) => c.id !== cliente?.id && t.includes(normalizar(c.nome)));
   const emMassa = /\b(cpfs|saldos|dados)\b.*\b(dos|de outros|de todos os) clientes\b/.test(t);
   return outroId || outroNome || emMassa;
 }
@@ -44,7 +52,7 @@ const RESGATE_TOTAL =
 
 /** Regra 6: terceiro pressionando, ou pessoa idosa confusa ou pedindo resgate total. */
 export function detectarVulneravel(texto: string, cliente: Cliente | null): boolean {
-  const t = texto.toLowerCase();
+  const t = normalizar(texto);
   if (TERCEIRO_PRESSIONANDO.test(t)) return true;
   const idosa = (cliente?.idade ?? 0) >= 60;
   return idosa && (CONFUSAO.test(t) || RESGATE_TOTAL.test(t));
