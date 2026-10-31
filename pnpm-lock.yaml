@@ -105,7 +105,7 @@ importers:
   packages/nucleo:
     dependencies:
       '@ai-sdk/anthropic':
-        specifier: ^4.0.94
+        specifier: 4.0.94
         version: 4.0.94(zod@4.6.7)
       '@ai-sdk/openai-compatible':
         specifier: 3.0.82
