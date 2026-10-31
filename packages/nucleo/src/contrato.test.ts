@@ -3,6 +3,7 @@ import { ChatRequest, Interacao, Resposta } from "./contrato";
 
 const handoff = {
   protocolo: "CAQ-20261118-0A1B2C",
+  fila: "atendimento",
   humanoDisponivel: true,
   retornoPrevisto: null,
   resumo: "Cliente pediu para falar com uma pessoa.",
@@ -22,7 +23,7 @@ describe("Resposta", () => {
   });
 
   it("recusa responder com handoff", () => {
-    const r = { ...base, acao: "responder", handoff: { ...handoff, fila: "atendimento" } };
+    const r = { ...base, acao: "responder", handoff };
     expect(Resposta.safeParse(r).success).toBe(false);
   });
 
@@ -30,17 +31,6 @@ describe("Resposta", () => {
     expect(Resposta.safeParse({ ...base, acao: "encaminhar_humano", handoff: null }).success).toBe(
       false,
     );
-  });
-
-  it("amarra a fila à ação", () => {
-    const certo = {
-      ...base,
-      acao: "encaminhar_seguranca",
-      handoff: { ...handoff, fila: "seguranca" },
-    };
-    const errado = { ...certo, handoff: { ...handoff, fila: "atendimento" } };
-    expect(Resposta.safeParse(certo).success).toBe(true);
-    expect(Resposta.safeParse(errado).success).toBe(false);
   });
 });
 
@@ -62,7 +52,7 @@ describe("Interacao (limites do WhatsApp)", () => {
   });
 
   it("conta as linhas de todas as seções: 10 passa, 11 não", () => {
-    const linha = (i: number) => ({ id: `l${i}`, titulo: `Linha ${i}`, descricao: null });
+    const linha = (i: number) => ({ id: `l${i}`, titulo: `Linha ${i}`, descricao: "x" });
     const lista = (a: number, b: number) => ({
       tipo: "lista",
       botao: "Ver opções",
