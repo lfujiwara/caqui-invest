@@ -1,10 +1,13 @@
-export { type DaConta, rodarAgente, SaidaAgente } from "./agente";
+export { type DaConta, rodarAgente, SaidaAgente, TOOL_DA_RESPOSTA } from "./agente";
 export { encaminhar, humanoDisponivel } from "./atendimento";
 export * from "./calendario";
+export { toolsDaConta } from "./conta";
 export * from "./contrato";
 export {
   type Cliente,
+  type Conversa,
   clientePorId,
+  conversas,
   lerDoRepo,
   type Operacao,
   operacoes,
