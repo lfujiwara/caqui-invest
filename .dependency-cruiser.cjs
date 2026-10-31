@@ -33,6 +33,14 @@ module.exports = {
       to: { path: "^packages/nucleo/src/index\\.ts$", dependencyTypesNot: ["type-only"] },
     },
     {
+      name: "fixtures-so-em-testes",
+      comment:
+        "Fixtures dos canais são dados de teste; importadas por código de produção, entram no bundle.",
+      severity: "error",
+      from: { pathNot: "\\.test\\.tsx?$" },
+      to: { path: "^apps/caqui/canais/[^/]+/fixtures\\.ts$" },
+    },
+    {
       name: "sem-ciclos",
       severity: "error",
       from: {},

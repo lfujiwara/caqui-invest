@@ -30,6 +30,11 @@ pnpm eval --url http://localhost:3000   # o mesmo, pela API publicada
 pnpm build && pnpm start
 ```
 
+O canal web desenha `resposta.ui` com o OpenUI (`@openuidev/react-lang` e `@openuidev/lang-core`, 1.0.2). Dois avisos sobre essas dependências:
+
+- Em `pnpm dev`, o `react-lang` monta sozinho um widget de devtools (OpenUI Inspect) no canto da página. A versão 1.0.2 não tem opção pública para desligar; o widget some em `pnpm build && pnpm start`, porque o bundler elimina o bloco quando `NODE_ENV=production`.
+- O `postinstall` do `lang-core` envia telemetria. O pnpm 10 bloqueia scripts de instalação por padrão e o pacote fica fora de `onlyBuiltDependencies` de propósito. O aviso "Ignored build scripts" no `pnpm install` é esperado: não rode `pnpm approve-builds` para ele.
+
 Para usar um modelo de verdade, copie `.env.example` para `.env` e troque `CAQUI_MODELO_ROTEADOR` e `CAQUI_MODELO_MOTIVO` para `ollama:<modelo>` ou `openrouter:<provedor>/<modelo>`.
 
 ```bash
