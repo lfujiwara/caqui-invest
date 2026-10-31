@@ -29,8 +29,8 @@
   --cq-alerta-fundo: #fdecee;
   --cq-positivo: #067a48;
 
-  --cq-fonte: Inter, -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --cq-fonte-mono: "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --cq-fonte: var(--cq-fonte-inter), Inter, -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --cq-fonte-mono: var(--cq-fonte-jetbrains), "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --cq-texto-display: 400 2rem/1.13 var(--cq-fonte);
   --cq-texto-titulo: 600 1.25rem/1.33 var(--cq-fonte);

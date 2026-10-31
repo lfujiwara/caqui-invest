@@ -1,12 +1,20 @@
 import type { Enviar } from "@caqui/nucleo";
-import { Conversa } from "./Conversa";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import css from "./Chat.module.css";
+import { Conversa } from "./Conversa";
 import tokens from "./tokens.module.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--cq-fonte-inter", display: "swap" });
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--cq-fonte-jetbrains",
+  display: "swap",
+});
 
 /** Canal web da Caqui Invest. `enviar` é a server action que fala com o núcleo. */
 export function Chat({ enviar, idCliente = null }: { enviar: Enviar; idCliente?: string | null }) {
   return (
-    <div className={tokens.tema}>
+    <div className={`${tokens.tema} ${inter.variable} ${mono.variable}`}>
       <Conversa enviar={enviar} idCliente={idCliente}>
         <Marca />
       </Conversa>

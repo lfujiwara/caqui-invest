@@ -1,9 +1,6 @@
-import type { Enviar } from "@caqui/nucleo";
+import { Chat } from "../../canais/whatsapp";
 import { enviarMensagem } from "../acoes";
-import { Esqueleto } from "../esqueleto";
-
-const enviar: Enviar = enviarMensagem;
 
 export default function PaginaWhatsapp() {
-  return <Esqueleto canal="whatsapp" enviar={enviar} />;
+  return <Chat enviar={enviarMensagem} />;
 }
