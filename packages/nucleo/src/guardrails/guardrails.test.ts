@@ -95,6 +95,9 @@ describe("regra 8", () => {
   });
 });
 
+const UI_VALIDA =
+  'root = Painel([p])\np = CartaoProtocolo("CQ-2026-000123", "seguranca", "Aberto")';
+
 describe("guardrails de saída", () => {
   const resposta = (texto: string, fontes: Resposta["fontes"]): Resposta => ({
     acao: "responder",
@@ -102,7 +105,7 @@ describe("guardrails de saída", () => {
     texto,
     fontes,
     interacao: null,
-    ui: "<Cartao />",
+    ui: UI_VALIDA,
     handoff: null,
   });
 
@@ -123,9 +126,15 @@ describe("guardrails de saída", () => {
     expect(verificarFontes(r, ["KB-006"])).toBeNull();
   });
 
-  it("WhatsApp perde o componente de UI; web mantém", () => {
+  it("WhatsApp perde o componente de UI; web mantém a ui válida", () => {
     const r = resposta("Oi", []);
     expect(adaptarAoCanal(r, "whatsapp").ui).toBeNull();
-    expect(adaptarAoCanal(r, "web").ui).toBe("<Cartao />");
+    expect(adaptarAoCanal(r, "web").ui).toBe(UI_VALIDA);
+  });
+
+  it("web: ui fora da biblioteca ou incompleta vira null", () => {
+    for (const ui of ["<Cartao />", 'root = Painel([t])\nt = Timeline("x", [e1])']) {
+      expect(adaptarAoCanal({ ...resposta("Oi", []), ui }, "web").ui).toBeNull();
+    }
   });
 });

@@ -1,5 +1,5 @@
 import { createLibrary, type ComponentRenderer } from "@openuidev/react-lang";
-import { definicoes, RAIZ, type NomeComponente, type PropsDe } from "./biblioteca";
+import { definicoes, RAIZ, type NomeComponente, type PropsDe } from "@caqui/nucleo/openui";
 import css from "./componentes.module.css";
 
 const reais = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });

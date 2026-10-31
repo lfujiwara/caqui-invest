@@ -22,5 +22,6 @@ export { atender } from "./harness";
 export { artigo, buscarKb, fonteKb, KB_OBSOLETAS } from "./kb";
 export { descreverModelos, modeloDoMotivo } from "./modelos";
 export type { Contexto, Motivo, Motivos } from "./motivo";
+export * from "./openui";
 export { ORDEM_DOS_GATILHOS } from "./roteador";
 export { linhaDeTrace, type Registrar, type Trace } from "./trace";

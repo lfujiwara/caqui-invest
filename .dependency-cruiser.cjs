@@ -25,6 +25,14 @@ module.exports = {
       to: { path: "^apps/" },
     },
     {
+      name: "canais-sem-raiz-do-nucleo",
+      comment:
+        "Os canais rodam no navegador. A raiz do núcleo puxa node:fs; valores vêm de subcaminhos como @caqui/nucleo/openui.",
+      severity: "error",
+      from: { path: "^apps/caqui/canais/", pathNot: "\\.test\\.tsx?$" },
+      to: { path: "^packages/nucleo/src/index\\.ts$", dependencyTypesNot: ["type-only"] },
+    },
+    {
       name: "sem-ciclos",
       severity: "error",
       from: {},

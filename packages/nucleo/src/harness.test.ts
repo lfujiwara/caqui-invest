@@ -10,6 +10,11 @@ import { lerModo, modeloDoMotivo } from "./modelos";
 import type { Motivo, Motivos } from "./motivo";
 import { linhaDeTrace, type Trace } from "./trace";
 
+const UI_VALIDA = [
+  "root = Painel([p])",
+  'p = CartaoProtocolo("CQ-2026-000123", "atendimento", "Em análise")',
+].join("\n");
+
 // Registro falso: cada fatia responde com o próprio id, para o teste ver quem foi chamado.
 function registroFalso(sobrescrever: Partial<Motivos> = {}): Motivos {
   const fatia = (id: MotivoId, gatilhos: RegExp): Motivo => ({
@@ -28,7 +33,7 @@ function registroFalso(sobrescrever: Partial<Motivos> = {}): Motivos {
             texto: `fatia ${id}`,
             fontes: [],
             interacao: null,
-            ui: "<Cartao />",
+            ui: UI_VALIDA,
             handoff: null,
           },
   });
@@ -147,6 +152,31 @@ describe("atender", () => {
     const { resposta, trace } = await atenderComTrace(req("o que é CDB?"), motivos);
     expect(resposta.acao).toBe("encaminhar_humano");
     expect(trace?.erro).toBe("provedor fora do ar");
+  });
+
+  it("web mantém ui válida e descarta a inválida antes de sair, com trace", async () => {
+    const valida = await atenderComTrace(req("o que é CDI?"));
+    expect(valida.resposta.ui).toBe(UI_VALIDA);
+    expect(valida.trace?.guardrails).not.toContain("ui_invalida");
+
+    const motivos = registroFalso({
+      duvida_produto: {
+        ...registroFalso().duvida_produto,
+        responder: async () => ({
+          acao: "responder",
+          motivo: "duvida_produto",
+          texto: "CDI é a taxa de referência entre bancos.",
+          fontes: [],
+          interacao: null,
+          ui: "<Cartao />",
+          handoff: null,
+        }),
+      },
+    });
+    const invalida = await atenderComTrace(req("o que é CDI?"), motivos);
+    expect(invalida.resposta.ui).toBeNull();
+    expect(invalida.resposta.texto).toBe("CDI é a taxa de referência entre bancos.");
+    expect(invalida.trace?.guardrails).toContain("ui_invalida");
   });
 
   it("WhatsApp recebe ui = null", async () => {

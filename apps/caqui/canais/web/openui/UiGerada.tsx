@@ -2,7 +2,7 @@
 
 import { Renderer } from "@openuidev/react-lang";
 import { Component, useEffect, useMemo, type ReactNode } from "react";
-import { analisarUi } from "./biblioteca";
+import { analisarUi } from "@caqui/nucleo/openui";
 import { bibliotecaReact } from "./componentes";
 
 class SemQuebrar extends Component<{ children: ReactNode }, { quebrou: boolean }> {

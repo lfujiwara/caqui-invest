@@ -120,7 +120,11 @@ export async function atender(
     return daFatia(rota);
   };
 
-  const resposta = Resposta.parse(adaptarAoCanal(await decidir(), req.canal));
+  const decidida = await decidir();
+  const resposta = Resposta.parse(adaptarAoCanal(decidida, req.canal));
+  if (req.canal === "web" && decidida.ui !== null && resposta.ui === null) {
+    guardrails.push("ui_invalida");
+  }
   registrar({
     momento: req.momento,
     canal: req.canal,

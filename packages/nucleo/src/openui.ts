@@ -1,6 +1,11 @@
 // Biblioteca fechada de componentes que o modelo pode gerar em `resposta.ui`.
 // Não importa React: o backend usa este arquivo para montar o prompt e validar a saída.
-import { createLibrary, createParser, defineComponent, type ElementNode } from "@openuidev/lang-core";
+import {
+  createLibrary,
+  createParser,
+  defineComponent,
+  type ElementNode,
+} from "@openuidev/lang-core";
 import { z } from "zod/v4";
 
 const Etapa = defineComponent({
@@ -77,7 +82,8 @@ const FaixaIR = defineComponent({
 
 const TabelaIR = defineComponent({
   name: "TabelaIR",
-  description: "Tabela regressiva do imposto de renda da renda fixa, com a faixa do cliente marcada.",
+  description:
+    "Tabela regressiva do imposto de renda da renda fixa, com a faixa do cliente marcada.",
   props: z.object({
     titulo: z.string(),
     faixas: z.array(FaixaIR.ref),
@@ -95,13 +101,25 @@ const Painel = defineComponent({
   component: null,
 });
 
-export const definicoes = { Painel, Timeline, Etapa, Comparativo, ItemComparado, CartaoProtocolo, TabelaIR, FaixaIR };
+export const definicoes = {
+  Painel,
+  Timeline,
+  Etapa,
+  Comparativo,
+  ItemComparado,
+  CartaoProtocolo,
+  TabelaIR,
+  FaixaIR,
+};
 export type NomeComponente = keyof typeof definicoes;
 export type PropsDe<N extends NomeComponente> = z.infer<(typeof definicoes)[N]["props"]>;
 
 export const RAIZ = "Painel" satisfies NomeComponente;
 
-export const bibliotecaOpenUI = createLibrary({ components: Object.values(definicoes), root: RAIZ });
+export const bibliotecaOpenUI = createLibrary({
+  components: Object.values(definicoes),
+  root: RAIZ,
+});
 
 /** Texto que descreve a biblioteca ao modelo. O backend o anexa ao prompt do canal web. */
 export const especificacaoOpenUI: string = bibliotecaOpenUI.prompt({
@@ -118,14 +136,14 @@ export const especificacaoOpenUI: string = bibliotecaOpenUI.prompt({
   ],
   examples: [
     [
-      'root = Painel([linha])',
+      "root = Painel([linha])",
       'linha = Timeline("Resgate do Caqui Renda Fixa FIF", [e1, e2, e3], "Pedido depois das 16h conta a partir do próximo dia útil.")',
       'e1 = Etapa("Pedido de resgate", "sex, 13/11 às 17h05", "concluida")',
       'e2 = Etapa("Cotização", "ter, 17/11", "atual", "Dia em que o valor das cotas é fixado")',
       'e3 = Etapa("Dinheiro na conta", "qua, 18/11", "prevista")',
     ].join("\n"),
     [
-      'root = Painel([comp])',
+      "root = Painel([comp])",
       'comp = Comparativo("Seus R$ 10.000 em 120 dias", 10000, "120 dias", [cdb, poup])',
       'cdb = ItemComparado("CDB Caqui 100% do CDI", 347.12, 78.10, 269.02)',
       'poup = ItemComparado("Poupança", 241.55, 0, 241.55)',
@@ -133,7 +151,13 @@ export const especificacaoOpenUI: string = bibliotecaOpenUI.prompt({
   ],
 });
 
-const COMPONENTES_DE_TOPO = new Set<string>(["Painel", "Timeline", "Comparativo", "CartaoProtocolo", "TabelaIR"]);
+const COMPONENTES_DE_TOPO = new Set<string>([
+  "Painel",
+  "Timeline",
+  "Comparativo",
+  "CartaoProtocolo",
+  "TabelaIR",
+]);
 const parser = createParser(bibliotecaOpenUI.toJSONSchema(), RAIZ);
 
 export type AnaliseUi = { ok: true; raiz: ElementNode } | { ok: false; motivo: string };
