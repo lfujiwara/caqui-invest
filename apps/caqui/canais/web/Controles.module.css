@@ -208,17 +208,22 @@
   color: var(--cq-texto-suave);
 }
 
-.pontos {
-  display: inline-flex;
-  gap: 5px;
-}
+@media (prefers-reduced-motion: reduce) {
+  .ponto,
+  .digitando,
+  .digitando::before,
+  .enviar[aria-busy="true"]::after,
+  .saudacao,
+  .convite,
+  .sugestoes li {
+    animation: none;
+  }
 
-.pontos i {
-  width: 9px;
-  height: 9px;
-  border-radius: 9999px;
-  background: var(--cq-caqui);
-  animation: pulsar 1.2s infinite ease-in-out;
+  .humano,
+  .sugestao,
+  .enviar {
+    transition: none;
+  }
 }
 
 .digitando {
@@ -255,49 +260,6 @@
   border: 3px solid currentColor;
   border-right-color: transparent;
   animation: girar 0.7s linear infinite;
-}
-
-.pontos i:nth-child(2) {
-  animation-delay: 0.15s;
-}
-
-.pontos i:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-@keyframes pulsar {
-  0%,
-  80%,
-  100% {
-    opacity: 0.25;
-  }
-  40% {
-    opacity: 1;
-    transform: translateY(-5px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pontos i {
-    animation: none;
-    opacity: 0.7;
-  }
-
-  .ponto,
-  .digitando,
-  .digitando::before,
-  .enviar[aria-busy="true"]::after,
-  .saudacao,
-  .convite,
-  .sugestoes li {
-    animation: none;
-  }
-
-  .humano,
-  .sugestao,
-  .enviar {
-    transition: none;
-  }
 }
 
 .erro {
