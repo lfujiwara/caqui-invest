@@ -1,7 +1,6 @@
-import { MotivoId, Resposta } from "@caqui/nucleo";
+import { analisarUi, MotivoId, Resposta } from "@caqui/nucleo";
 import { describe, expect, it } from "vitest";
 import { fixturePorMotivo, fixtures } from "./fixtures";
-import { analisarUi } from "@caqui/nucleo";
 
 const todas = Object.entries(fixtures);
 

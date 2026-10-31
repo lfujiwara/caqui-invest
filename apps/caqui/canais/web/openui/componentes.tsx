@@ -1,5 +1,5 @@
-import { createLibrary, type ComponentRenderer } from "@openuidev/react-lang";
-import { definicoes, RAIZ, type NomeComponente, type PropsDe } from "@caqui/nucleo/openui";
+import { definicoes, type NomeComponente, type PropsDe, RAIZ } from "@caqui/nucleo/openui";
+import { type ComponentRenderer, createLibrary } from "@openuidev/react-lang";
 import css from "./componentes.module.css";
 
 const reais = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -22,8 +22,12 @@ export function Timeline({ titulo, etapas, nota }: PropsDe<"Timeline">) {
     <section className={css.cartao} aria-label={titulo}>
       <h3 className={css.titulo}>{titulo}</h3>
       <ol className={css.etapas}>
-        {etapas.map(({ props: etapa }, i) => (
-          <li key={i} className={css.etapa} data-estado={etapa.estado}>
+        {etapas.map(({ props: etapa }) => (
+          <li
+            key={`${etapa.rotulo}|${etapa.quando}`}
+            className={css.etapa}
+            data-estado={etapa.estado}
+          >
             <span className={css.marcador} aria-hidden />
             <div>
               <p className={css.etapaRotulo}>
@@ -50,8 +54,8 @@ export function Comparativo({ titulo, valorAplicado, periodo, itens }: PropsDe<"
         Valor aplicado <span className={css.numero}>{reais.format(valorAplicado)}</span> · {periodo}
       </p>
       <ul className={css.comparados}>
-        {itens.map(({ props: item }, i) => (
-          <li key={i} className={css.comparado}>
+        {itens.map(({ props: item }) => (
+          <li key={item.produto} className={css.comparado}>
             <p className={css.comparadoProduto}>{item.produto}</p>
             <div className={css.barra} aria-hidden>
               <span style={{ width: `${Math.max(4, (item.rendimentoLiquido / maior) * 100)}%` }} />
@@ -75,7 +79,9 @@ export function Comparativo({ titulo, valorAplicado, periodo, itens }: PropsDe<"
           </li>
         ))}
       </ul>
-      <p className={css.nota}>Comparação entre valores líquidos, depois do imposto. Não é uma recomendação.</p>
+      <p className={css.nota}>
+        Comparação entre valores líquidos, depois do imposto. Não é uma recomendação.
+      </p>
     </section>
   );
 }
@@ -117,8 +123,8 @@ export function TabelaIR({ titulo, faixas, nota }: PropsDe<"TabelaIR">) {
           </tr>
         </thead>
         <tbody>
-          {faixas.map(({ props: faixa }, i) => (
-            <tr key={i} data-atual={faixa.atual || undefined}>
+          {faixas.map(({ props: faixa }) => (
+            <tr key={faixa.prazo} data-atual={faixa.atual || undefined}>
               <th scope="row">
                 {faixa.prazo}
                 {faixa.atual && <span className={css.selo}>Sua aplicação</span>}

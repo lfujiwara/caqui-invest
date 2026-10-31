@@ -249,7 +249,7 @@
   justify-content: center;
   gap: var(--cq-e-2);
   margin-top: var(--cq-e-2);
-  font: 400 0.875rem/1.4 var(--cq-fonte);
+  font: 400 0.875rem / 1.4 var(--cq-fonte);
   color: var(--cq-texto-suave);
 }
 

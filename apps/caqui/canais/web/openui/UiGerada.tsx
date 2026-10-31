@@ -1,19 +1,19 @@
 "use client";
 
-import { Renderer } from "@openuidev/react-lang";
-import { Component, useEffect, useMemo, type ReactNode } from "react";
 import { analisarUi } from "@caqui/nucleo/openui";
+import { Renderer } from "@openuidev/react-lang";
+import { Component, type ReactNode, useEffect, useMemo } from "react";
 import { bibliotecaReact } from "./componentes";
 
 class SemQuebrar extends Component<{ children: ReactNode }, { quebrou: boolean }> {
-  state = { quebrou: false };
+  override state = { quebrou: false };
   static getDerivedStateFromError() {
     return { quebrou: true };
   }
-  componentDidCatch(erro: unknown) {
+  override componentDidCatch(erro: unknown) {
     console.warn("[caqui/openui] componente gerado falhou ao renderizar e foi descartado", erro);
   }
-  render() {
+  override render() {
     return this.state.quebrou ? null : this.props.children;
   }
 }

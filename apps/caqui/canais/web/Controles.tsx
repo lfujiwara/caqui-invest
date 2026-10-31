@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import css from "./Controles.module.css";
 import { MOMENTOS_SIMULADOS, type MomentoSimulado } from "./momento";
 import { SUGESTOES } from "./sugestoes";
-import css from "./Controles.module.css";
 
 export function BotaoHumano({
   disponivel,
@@ -15,8 +15,23 @@ export function BotaoHumano({
   aoClicar: () => void;
 }) {
   return (
-    <button type="button" className={css.humano} disabled={desabilitado} onClick={aoClicar} data-disponivel={disponivel}>
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <button
+      type="button"
+      className={css.humano}
+      disabled={desabilitado}
+      onClick={aoClicar}
+      data-disponivel={disponivel}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="22"
+        height="22"
+        aria-hidden
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
         <circle cx="12" cy="8" r="4" />
         <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
       </svg>
@@ -41,7 +56,8 @@ export function Vazio({ aoEscolher }: { aoEscolher: (texto: string) => void }) {
     <section className={css.vazio}>
       <h1 className={css.saudacao}>Olá! Como podemos ajudar?</h1>
       <p className={css.convite}>
-        Escreva do seu jeito ou toque em um assunto. Se preferir, fale com uma pessoa a qualquer momento.
+        Escreva do seu jeito ou toque em um assunto. Se preferir, fale com uma pessoa a qualquer
+        momento.
       </p>
       <ul className={css.sugestoes}>
         {Object.entries(SUGESTOES).map(([motivo, { assunto, pergunta }]) => (
@@ -81,7 +97,13 @@ export function ErroEnvio({ aoTentar }: { aoTentar: () => void }) {
   );
 }
 
-export function Composer({ desabilitado, aoEnviar }: { desabilitado: boolean; aoEnviar: (texto: string) => void }) {
+export function Composer({
+  desabilitado,
+  aoEnviar,
+}: {
+  desabilitado: boolean;
+  aoEnviar: (texto: string) => void;
+}) {
   const [texto, setTexto] = useState("");
   function enviar() {
     if (!texto.trim() || desabilitado) return;
@@ -113,8 +135,23 @@ export function Composer({ desabilitado, aoEnviar }: { desabilitado: boolean; ao
           }
         }}
       />
-      <button type="submit" className={css.enviar} disabled={desabilitado || !texto.trim()} aria-label="Enviar">
-        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+      <button
+        type="submit"
+        className={css.enviar}
+        disabled={desabilitado || !texto.trim()}
+        aria-label="Enviar"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          aria-hidden
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M12 19V5M5 12l7-7 7 7" />
         </svg>
       </button>
@@ -122,7 +159,13 @@ export function Composer({ desabilitado, aoEnviar }: { desabilitado: boolean; ao
   );
 }
 
-export function SeletorMomento({ valor, aoMudar }: { valor: MomentoSimulado; aoMudar: (m: MomentoSimulado) => void }) {
+export function SeletorMomento({
+  valor,
+  aoMudar,
+}: {
+  valor: MomentoSimulado;
+  aoMudar: (m: MomentoSimulado) => void;
+}) {
   return (
     <label className={css.momento}>
       Momento (demo)

@@ -97,7 +97,8 @@ export const fixtures = {
       fila: "seguranca",
       humanoDisponivel: true,
       retornoPrevisto: null,
-      resumo: "Cliente recebeu ligação de suposto gerente da Caqui pedindo o código do SMS. Ainda não informou o código. Sessão bloqueada.",
+      resumo:
+        "Cliente recebeu ligação de suposto gerente da Caqui pedindo o código do SMS. Ainda não informou o código. Sessão bloqueada.",
     },
   },
   impostos: {
@@ -116,7 +117,11 @@ export const fixtures = {
         {
           titulo: "Documentos",
           linhas: [
-            { id: "informe", titulo: "Informe de rendimentos", descricao: "Disponível a partir de fevereiro" },
+            {
+              id: "informe",
+              titulo: "Informe de rendimentos",
+              descricao: "Disponível a partir de fevereiro",
+            },
             { id: "extrato", titulo: "Extrato do mês" },
             { id: "nota", titulo: "Nota de corretagem", descricao: "Para operações com ações" },
           ],
@@ -145,7 +150,8 @@ export const fixtures = {
       fila: "especialista",
       humanoDisponivel: true,
       retornoPrevisto: null,
-      resumo: "Cliente tem R$ 50 mil para investir e pediu indicação. Ainda sem perfil de investidor preenchido.",
+      resumo:
+        "Cliente tem R$ 50 mil para investir e pediu indicação. Ainda sem perfil de investidor preenchido.",
     },
   },
   reclamacao: {
@@ -161,7 +167,8 @@ export const fixtures = {
       fila: "atendimento",
       humanoDisponivel: true,
       retornoPrevisto: null,
-      resumo: "Cliente pediu o encerramento da conta na primeira mensagem. Nenhuma tentativa de retenção feita.",
+      resumo:
+        "Cliente pediu o encerramento da conta na primeira mensagem. Nenhuma tentativa de retenção feita.",
     },
   },
   outros: {
@@ -208,7 +215,8 @@ export const fixtures = {
       fila: "atendimento",
       humanoDisponivel: false,
       retornoPrevisto: "quinta, 19/11, a partir das 8h",
-      resumo: "Cliente pediu para falar com uma pessoa às 23h. Sem outra demanda registrada até aqui.",
+      resumo:
+        "Cliente pediu para falar com uma pessoa às 23h. Sem outra demanda registrada até aqui.",
     },
   },
   humanoDisponivel: {
@@ -229,7 +237,8 @@ export const fixtures = {
   uiInvalida: {
     motivo: "outros",
     acao: "responder",
-    texto: "Esta resposta traz um componente fora da biblioteca. O texto aparece; o componente, não.",
+    texto:
+      "Esta resposta traz um componente fora da biblioteca. O texto aparece; o componente, não.",
     fontes: [],
     interacao: null,
     ui: 'root = Painel([g])\ng = GraficoDePizza("Carteira", [1, 2, 3])',

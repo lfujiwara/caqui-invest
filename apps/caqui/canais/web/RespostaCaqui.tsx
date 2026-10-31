@@ -20,7 +20,11 @@ export function RespostaCaqui({
 }) {
   const seguranca = resposta.acao === "encaminhar_seguranca";
   return (
-    <article className={css.resposta} data-seguranca={seguranca || undefined} role={seguranca ? "alert" : undefined}>
+    <article
+      className={css.resposta}
+      data-seguranca={seguranca || undefined}
+      role={seguranca ? "alert" : undefined}
+    >
       {seguranca && (
         <p className={css.alertaTitulo}>
           <IconeAlerta />
@@ -31,7 +35,9 @@ export function RespostaCaqui({
       {resposta.handoff && <CartaoHandoff handoff={resposta.handoff} />}
       {resposta.ui && <UiGerada ui={resposta.ui} />}
       {resposta.fontes.length > 0 && <Fontes fontes={resposta.fontes} />}
-      {ativa && resposta.interacao && <Opcoes interacao={resposta.interacao} aoEscolher={aoEscolher} />}
+      {ativa && resposta.interacao && (
+        <Opcoes interacao={resposta.interacao} aoEscolher={aoEscolher} />
+      )}
     </article>
   );
 }
@@ -39,11 +45,19 @@ export function RespostaCaqui({
 function Texto({ texto }: { texto: string }) {
   return (
     <div className={css.texto}>
-      {texto.split(/\n{2,}/).map((paragrafo, i) => (
-        <p key={i}>{paragrafo}</p>
+      {paragrafos(texto).map(({ inicio, paragrafo }) => (
+        <p key={inicio}>{paragrafo}</p>
       ))}
     </div>
   );
+}
+
+/** Parágrafos com a posição em que começam no texto, que é única e serve de key. */
+function paragrafos(texto: string): { inicio: number; paragrafo: string }[] {
+  return Array.from(texto.matchAll(/[^\n]+(?:\n(?!\n)[^\n]*)*/g), (m) => ({
+    inicio: m.index,
+    paragrafo: m[0],
+  }));
 }
 
 const TITULO_HANDOFF = {
@@ -79,7 +93,9 @@ function CartaoHandoff({ handoff }: { handoff: Handoff }) {
         <p className={css.resumoRotulo}>O que quem vai te atender já sabe</p>
         <p className={css.resumoTexto}>{handoff.resumo}</p>
       </div>
-      <p className={css.semRepetir}>Você não precisa repetir nada. Quem atende vê esta conversa e o protocolo.</p>
+      <p className={css.semRepetir}>
+        Você não precisa repetir nada. Quem atende vê esta conversa e o protocolo.
+      </p>
     </section>
   );
 }
@@ -105,8 +121,11 @@ function Fontes({ fontes }: { fontes: Fonte[] }) {
     <div className={css.fontes}>
       <p className={css.fontesRotulo}>De onde veio esta resposta</p>
       <ul className={css.chips}>
-        {fontes.map((fonte, i) => (
-          <li key={i} className={css.chip}>
+        {fontes.map((fonte) => (
+          <li
+            key={fonte.tipo === "kb" ? fonte.id : `conta:${fonte.descricao}`}
+            className={css.chip}
+          >
             {fonte.tipo === "kb" ? (
               <>
                 <span className={css.chipId}>{fonte.id}</span>
@@ -128,13 +147,18 @@ function Fontes({ fontes }: { fontes: Fonte[] }) {
 function Opcoes({ interacao, aoEscolher }: { interacao: Interacao; aoEscolher: AoEscolher }) {
   if (interacao.tipo === "botoes") {
     return (
-      <div className={css.botoes} role="group" aria-label="Opções de resposta">
+      <fieldset className={css.botoes} aria-label="Opções de resposta">
         {interacao.opcoes.map((opcao) => (
-          <button key={opcao.id} type="button" className={css.opcao} onClick={() => aoEscolher(opcao.titulo)}>
+          <button
+            key={opcao.id}
+            type="button"
+            className={css.opcao}
+            onClick={() => aoEscolher(opcao.titulo)}
+          >
             {opcao.titulo}
           </button>
         ))}
-      </div>
+      </fieldset>
     );
   }
   // No web a lista já vem aberta: um toque a menos do que no WhatsApp, onde `botao` abre o menu.
@@ -147,7 +171,11 @@ function Opcoes({ interacao, aoEscolher }: { interacao: Interacao; aoEscolher: A
           <ul className={css.linhas}>
             {secao.linhas.map((linha) => (
               <li key={linha.id}>
-                <button type="button" className={css.linha} onClick={() => aoEscolher(linha.titulo)}>
+                <button
+                  type="button"
+                  className={css.linha}
+                  onClick={() => aoEscolher(linha.titulo)}
+                >
                   <span className={css.linhaTitulo}>{linha.titulo}</span>
                   {linha.descricao && <span className={css.linhaDescricao}>{linha.descricao}</span>}
                 </button>
@@ -162,7 +190,17 @@ function Opcoes({ interacao, aoEscolher }: { interacao: Interacao; aoEscolher: A
 
 function IconeAlerta() {
   return (
-    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      width="28"
+      height="28"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M12 3 2.5 20h19L12 3Z" />
       <path d="M12 10v4.5M12 17.5v.01" />
     </svg>

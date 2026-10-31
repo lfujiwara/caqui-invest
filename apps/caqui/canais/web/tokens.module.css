@@ -29,17 +29,21 @@
   --cq-alerta-fundo: #fdecee;
   --cq-positivo: #067a48;
 
-  --cq-fonte: var(--cq-fonte-inter), Inter, -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --cq-fonte-mono: var(--cq-fonte-jetbrains), "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --cq-fonte:
+    var(--cq-fonte-inter), Inter, -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  --cq-fonte-mono:
+    var(--cq-fonte-jetbrains), "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
 
-  --cq-texto-display: 400 2rem/1.13 var(--cq-fonte);
-  --cq-texto-titulo: 600 1.25rem/1.33 var(--cq-fonte);
-  --cq-texto-titulo-p: 600 1.125rem/1.3 var(--cq-fonte);
-  --cq-texto-corpo: 400 1.125rem/1.55 var(--cq-fonte);
-  --cq-texto-corpo-p: 400 1rem/1.5 var(--cq-fonte);
-  --cq-texto-legenda: 600 0.9375rem/1.4 var(--cq-fonte);
-  --cq-texto-botao: 600 1.0625rem/1.15 var(--cq-fonte);
-  --cq-texto-numero: 500 1.0625rem/1.4 var(--cq-fonte-mono);
+  --cq-texto-display: 400 2rem / 1.13 var(--cq-fonte);
+  --cq-texto-titulo: 600 1.25rem / 1.33 var(--cq-fonte);
+  --cq-texto-titulo-p: 600 1.125rem / 1.3 var(--cq-fonte);
+  --cq-texto-corpo: 400 1.125rem / 1.55 var(--cq-fonte);
+  --cq-texto-corpo-p: 400 1rem / 1.5 var(--cq-fonte);
+  --cq-texto-legenda: 600 0.9375rem / 1.4 var(--cq-fonte);
+  --cq-texto-botao: 600 1.0625rem / 1.15 var(--cq-fonte);
+  --cq-texto-numero: 500 1.0625rem / 1.4 var(--cq-fonte-mono);
 
   --cq-e-1: 4px;
   --cq-e-2: 8px;
