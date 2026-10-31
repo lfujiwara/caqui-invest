@@ -93,7 +93,8 @@ export const fixtures: Record<MotivoId, Resposta> = {
   impostos_documentos: {
     motivo: "impostos_documentos",
     acao: "responder",
-    texto: "O informe de rendimentos de 2025 já está disponível no app, em Perfil > Documentos. Escolha abaixo qual documento você quer receber por aqui.",
+    texto:
+      "O informe de rendimentos de 2025 já está disponível no app, em Perfil > Documentos. Escolha abaixo qual documento você quer receber por aqui.",
     fontes: [{ tipo: "kb", id: "KB-017", titulo: "Informe de rendimentos" }],
     interacao: {
       tipo: "lista",
@@ -102,15 +103,27 @@ export const fixtures: Record<MotivoId, Resposta> = {
         {
           titulo: "Imposto de renda",
           linhas: [
-            { id: "informe_2025", titulo: "Informe 2025", descricao: "Ano-calendário 2025, todos os produtos" },
+            {
+              id: "informe_2025",
+              titulo: "Informe 2025",
+              descricao: "Ano-calendário 2025, todos os produtos",
+            },
             { id: "informe_2024", titulo: "Informe 2024", descricao: "Ano-calendário 2024" },
           ],
         },
         {
           titulo: "Movimentação",
           linhas: [
-            { id: "extrato_out", titulo: "Extrato de outubro", descricao: "Aplicações, resgates e rendimentos" },
-            { id: "nota", titulo: "Notas de corretagem", descricao: "Operações em ações dos últimos 90 dias" },
+            {
+              id: "extrato_out",
+              titulo: "Extrato de outubro",
+              descricao: "Aplicações, resgates e rendimentos",
+            },
+            {
+              id: "nota",
+              titulo: "Notas de corretagem",
+              descricao: "Operações em ações dos últimos 90 dias",
+            },
             { id: "comprovante", titulo: "Comprovante de resgate" },
           ],
         },
@@ -150,7 +163,8 @@ export const fixtures: Record<MotivoId, Resposta> = {
       fila: "atendimento",
       humanoDisponivel: false,
       retornoPrevisto: "2026-11-19T08:00:00-03:00",
-      resumo: "Pedido de encerramento de conta na primeira mensagem. Motivo: insatisfação com tarifas.",
+      resumo:
+        "Pedido de encerramento de conta na primeira mensagem. Motivo: insatisfação com tarifas.",
     },
   },
 

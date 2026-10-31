@@ -1,14 +1,20 @@
 import type { MotivoId } from "@caqui/nucleo";
 import {
+  type Corte,
   LIMITE_CORPO_INTERATIVO,
   LIMITE_TEXTO,
   MAX_BOTOES,
   MAX_LINHAS_LISTA,
-  type Corte,
 } from "./limites";
 import estilos from "./Simulador.module.css";
 
-export type Rodada = { pergunta: string; motivo: MotivoId; hora: string; cortes: Corte[] };
+export type Rodada = {
+  id: string;
+  pergunta: string;
+  motivo: MotivoId;
+  hora: string;
+  cortes: { id: string; corte: Corte }[];
+};
 
 const NOME_DO_MOTIVO: Record<MotivoId, string> = {
   onde_esta_meu_dinheiro: "Onde está meu dinheiro",
@@ -59,18 +65,27 @@ function descrever(corte: Corte): Descricao {
         perda: true,
       };
     case "encurtado":
-      return { titulo: "Texto encurtado", detalhe: `"${corte.original}" virou "${corte.exibido}"`, perda: true };
+      return {
+        titulo: "Texto encurtado",
+        detalhe: `"${corte.original}" virou "${corte.exibido}"`,
+        perda: true,
+      };
   }
 }
 
 export function PainelCortes({ rodadas }: { rodadas: Rodada[] }) {
   if (rodadas.length === 0) {
-    return <p className={estilos.painelVazio}>Mande uma mensagem. Cada resposta da Caqui aparece aqui com o que o canal teve de cortar ou adaptar.</p>;
+    return (
+      <p className={estilos.painelVazio}>
+        Mande uma mensagem. Cada resposta da Caqui aparece aqui com o que o canal teve de cortar ou
+        adaptar.
+      </p>
+    );
   }
   return (
     <ol className={estilos.rodadas}>
       {rodadas.map((rodada, i) => (
-        <li key={i} className={estilos.rodada}>
+        <li key={rodada.id} className={estilos.rodada}>
           <div className={estilos.rodadaTopo}>
             <span className={estilos.rodadaNumero}>Resposta {i + 1}</span>
             <span className={estilos.rodadaMotivo}>{NOME_DO_MOTIVO[rodada.motivo]}</span>
@@ -81,10 +96,10 @@ export function PainelCortes({ rodadas }: { rodadas: Rodada[] }) {
             <p className={estilos.semCorte}>Nada cortado: a resposta coube inteira no canal.</p>
           ) : (
             <ul className={estilos.cortes}>
-              {rodada.cortes.map((corte, j) => {
+              {rodada.cortes.map(({ id, corte }) => {
                 const d = descrever(corte);
                 return (
-                  <li key={j} className={d.perda ? estilos.cortePerda : estilos.corteAdaptado}>
+                  <li key={id} className={d.perda ? estilos.cortePerda : estilos.corteAdaptado}>
                     <strong>{d.titulo}</strong>
                     <span>{d.detalhe}</span>
                     {d.codigo && <code className={estilos.trechoUi}>{d.codigo}</code>}

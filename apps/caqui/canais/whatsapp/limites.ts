@@ -39,7 +39,10 @@ export type MensagemWhatsApp =
 export function paraWhatsApp(resposta: Resposta): MensagemWhatsApp[] {
   const cortesGerais: Corte[] = [];
   if (resposta.ui !== null && resposta.ui.trim() !== "") {
-    cortesGerais.push({ tipo: "ui_descartada", trecho: encurtar(resposta.ui.trim(), LIMITE_TRECHO_UI) });
+    cortesGerais.push({
+      tipo: "ui_descartada",
+      trecho: encurtar(resposta.ui.trim(), LIMITE_TRECHO_UI),
+    });
   }
 
   const formatado = formatarParaWhatsApp(resposta.texto);
@@ -49,7 +52,10 @@ export function paraWhatsApp(resposta: Resposta): MensagemWhatsApp[] {
 
   const seguranca = resposta.acao === "encaminhar_seguranca";
   // A orientação vem antes de qualquer outra coisa (regra 5), então nunca vai para o corpo de um interativo.
-  const corpoPrincipal = juntar(seguranca ? `${CABECALHO_ALERTA}\n${formatado.texto}` : formatado.texto, linhaDeFontes(resposta.fontes));
+  const corpoPrincipal = juntar(
+    seguranca ? `${CABECALHO_ALERTA}\n${formatado.texto}` : formatado.texto,
+    linhaDeFontes(resposta.fontes),
+  );
 
   const mensagens: MensagemWhatsApp[] = [];
   const interativo = resposta.interacao && adaptarInteracao(resposta.interacao);
@@ -61,7 +67,10 @@ export function paraWhatsApp(resposta: Resposta): MensagemWhatsApp[] {
     mensagens.push(...textoEmPartes(corpoPrincipal));
     if (interativo) {
       if (!seguranca && corpoPrincipal.length > 0) {
-        mensagens[mensagens.length - 1].cortes.push({ tipo: "corpo_separado", caracteres: corpoPrincipal.length });
+        mensagens.at(-1)?.cortes.push({
+          tipo: "corpo_separado",
+          caracteres: corpoPrincipal.length,
+        });
       }
       mensagens.push(interativo.comCorpo(interativo.corpoSeparado));
     }
@@ -85,7 +94,10 @@ function adaptarInteracao(interacao: Interacao) {
   };
 
   if (interacao.tipo === "botoes" && interacao.opcoes.length <= MAX_BOTOES) {
-    const opcoes = interacao.opcoes.map((o) => ({ id: o.id, titulo: titulo(o.titulo, LIMITE_TITULO_BOTAO) }));
+    const opcoes = interacao.opcoes.map((o) => ({
+      id: o.id,
+      titulo: titulo(o.titulo, LIMITE_TITULO_BOTAO),
+    }));
     return {
       corpoSeparado: CORPO_BOTOES_SEPARADO,
       comCorpo: (corpo: string): MensagemWhatsApp => ({ tipo: "botoes", corpo, opcoes, cortes }),
@@ -119,16 +131,25 @@ function adaptarInteracao(interacao: Interacao) {
       linhas.push({
         id: linha.id,
         titulo: titulo(linha.titulo, LIMITE_TITULO_LINHA),
-        ...(linha.descricao !== undefined && { descricao: titulo(linha.descricao, LIMITE_DESCRICAO_LINHA) }),
+        ...(linha.descricao !== undefined && {
+          descricao: titulo(linha.descricao, LIMITE_DESCRICAO_LINHA),
+        }),
       });
     }
-    if (linhas.length > 0) secoes.push({ titulo: titulo(secao.titulo, LIMITE_TITULO_SECAO), linhas });
+    if (linhas.length > 0)
+      secoes.push({ titulo: titulo(secao.titulo, LIMITE_TITULO_SECAO), linhas });
   }
   if (descartadas.length > 0) cortes.push({ tipo: "opcoes_cortadas", descartadas });
 
   return {
     corpoSeparado: CORPO_LISTA_SEPARADO,
-    comCorpo: (corpo: string): MensagemWhatsApp => ({ tipo: "lista", corpo, botao, secoes, cortes }),
+    comCorpo: (corpo: string): MensagemWhatsApp => ({
+      tipo: "lista",
+      corpo,
+      botao,
+      secoes,
+      cortes,
+    }),
   };
 }
 
@@ -142,11 +163,11 @@ function textoEmPartes(texto: string): MensagemWhatsApp[] {
     resto = resto.slice(corte).trimStart();
   }
   partes.push(resto);
-  const mensagens: MensagemWhatsApp[] = partes.map((p) => ({ tipo: "texto", texto: p, cortes: [] }));
-  if (partes.length > 1) {
-    mensagens[0].cortes.push({ tipo: "texto_dividido", caracteres: texto.length, partes: partes.length });
-  }
-  return mensagens;
+  const divisao: Corte[] =
+    partes.length > 1
+      ? [{ tipo: "texto_dividido", caracteres: texto.length, partes: partes.length }]
+      : [];
+  return partes.map((p, i) => ({ tipo: "texto", texto: p, cortes: i === 0 ? divisao : [] }));
 }
 
 function pontoDeCorte(texto: string, limite: number): number {
@@ -160,7 +181,9 @@ function pontoDeCorte(texto: string, limite: number): number {
 
 function linhaDeFontes(fontes: Fonte[]): string {
   if (fontes.length === 0) return "";
-  const nomes = fontes.map((f) => (f.tipo === "kb" ? `${f.id} ${f.titulo}` : `dados da sua conta (${f.descricao})`));
+  const nomes = fontes.map((f) =>
+    f.tipo === "kb" ? `${f.id} ${f.titulo}` : `dados da sua conta (${f.descricao})`,
+  );
   return `${fontes.length === 1 ? "Fonte" : "Fontes"}: ${nomes.join("; ")}`;
 }
 
@@ -177,7 +200,9 @@ function avisoDeHandoff(handoff: Handoff): string {
   if (handoff.humanoDisponivel) {
     return `Você foi encaminhado para ${NOME_DA_FILA[handoff.fila]}. Uma pessoa continua esta conversa e já vê o histórico. Protocolo ${handoff.protocolo}.`;
   }
-  const retorno = handoff.retornoPrevisto ? formatarRetorno(handoff.retornoPrevisto) : "a partir das 8h";
+  const retorno = handoff.retornoPrevisto
+    ? formatarRetorno(handoff.retornoPrevisto)
+    : "a partir das 8h";
   return `Atendimento por pessoa ${HORARIO_HUMANO}. Sua demanda foi registrada com o protocolo ${handoff.protocolo} e ${NOME_DA_FILA[handoff.fila]} retorna ${retorno}. Você não vai precisar repetir nada.`;
 }
 
@@ -193,7 +218,9 @@ function formatarRetorno(retorno: string): string {
   if (!/^\d{4}-\d{2}-\d{2}T/.test(retorno)) return retorno;
   const data = new Date(retorno);
   if (Number.isNaN(data.getTime())) return retorno;
-  const partes = Object.fromEntries(FORMATO_RETORNO.formatToParts(data).map((p) => [p.type, p.value]));
+  const partes = Object.fromEntries(
+    FORMATO_RETORNO.formatToParts(data).map((p) => [p.type, p.value]),
+  );
   return `em ${partes.day}/${partes.month} a partir das ${Number(partes.hour)}h${partes.minute === "00" ? "" : partes.minute}`;
 }
 
@@ -202,21 +229,64 @@ type Regra = { detalhe: string; padrao: RegExp; troca: string | ((...m: string[]
 const REGRAS_DE_FORMATACAO: Regra[] = [
   { detalhe: "HTML removido", padrao: /<br\s*\/?>/gi, troca: "\n" },
   { detalhe: "HTML removido", padrao: /<\/?p\b[^>]*>/gi, troca: "\n" },
-  { detalhe: "HTML removido", padrao: /<(b|strong)\b[^>]*>([\s\S]*?)<\/\1>/gi, troca: (_, __, t) => `*${t}*` },
-  { detalhe: "HTML removido", padrao: /<(i|em)\b[^>]*>([\s\S]*?)<\/\1>/gi, troca: (_, __, t) => `_${t}_` },
-  { detalhe: "HTML removido", padrao: /<(s|del|strike)\b[^>]*>([\s\S]*?)<\/\1>/gi, troca: (_, __, t) => `~${t}~` },
-  { detalhe: "link virou texto", padrao: /<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, troca: (_, url, t) => linkEmTexto(t, url) },
+  {
+    detalhe: "HTML removido",
+    padrao: /<(b|strong)\b[^>]*>([\s\S]*?)<\/\1>/gi,
+    troca: (_, __, t) => `*${t}*`,
+  },
+  {
+    detalhe: "HTML removido",
+    padrao: /<(i|em)\b[^>]*>([\s\S]*?)<\/\1>/gi,
+    troca: (_, __, t) => `_${t}_`,
+  },
+  {
+    detalhe: "HTML removido",
+    padrao: /<(s|del|strike)\b[^>]*>([\s\S]*?)<\/\1>/gi,
+    troca: (_, __, t) => `~${t}~`,
+  },
+  {
+    detalhe: "link virou texto",
+    padrao: /<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi,
+    troca: (_, url, t) => linkEmTexto(t, url),
+  },
   { detalhe: "HTML removido", padrao: /<\/?[a-z][^>]*>/gi, troca: "" },
-  { detalhe: "imagem virou texto", padrao: /!\[([^\]]*)\]\(([^)\s]+)\)/g, troca: (_, alt, url) => linkEmTexto(alt, url) },
-  { detalhe: "link virou texto", padrao: /\[([^\]]+)\]\(([^)\s]+)\)/g, troca: (_, t, url) => linkEmTexto(t, url) },
-  { detalhe: "título virou negrito", padrao: /^#{1,6}[ \t]+(.+?)[ \t]*#*$/gm, troca: (_, t) => `*${t}*` },
-  { detalhe: "negrito markdown convertido", padrao: /\*\*([^*\n]+)\*\*/g, troca: (_, t) => `*${t}*` },
+  {
+    detalhe: "imagem virou texto",
+    padrao: /!\[([^\]]*)\]\(([^)\s]+)\)/g,
+    troca: (_, alt, url) => linkEmTexto(alt, url),
+  },
+  {
+    detalhe: "link virou texto",
+    padrao: /\[([^\]]+)\]\(([^)\s]+)\)/g,
+    troca: (_, t, url) => linkEmTexto(t, url),
+  },
+  {
+    detalhe: "título virou negrito",
+    padrao: /^#{1,6}[ \t]+(.+?)[ \t]*#*$/gm,
+    troca: (_, t) => `*${t}*`,
+  },
+  {
+    detalhe: "negrito markdown convertido",
+    padrao: /\*\*([^*\n]+)\*\*/g,
+    troca: (_, t) => `*${t}*`,
+  },
   { detalhe: "negrito markdown convertido", padrao: /__([^_\n]+)__/g, troca: (_, t) => `*${t}*` },
   { detalhe: "riscado markdown convertido", padrao: /~~([^~\n]+)~~/g, troca: (_, t) => `~${t}~` },
-  { detalhe: "código inline virou monoespaçado", padrao: /`([^`\n]+)`/g, troca: (_, t) => "```" + t + "```" },
+  {
+    detalhe: "código inline virou monoespaçado",
+    padrao: /`([^`\n]+)`/g,
+    troca: (_, t) => `\`\`\`${t}\`\`\``,
+  },
 ];
 
-const ENTIDADES: Record<string, string> = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&nbsp;": " " };
+const ENTIDADES: Record<string, string> = {
+  "&amp;": "&",
+  "&lt;": "<",
+  "&gt;": ">",
+  "&quot;": '"',
+  "&#39;": "'",
+  "&nbsp;": " ",
+};
 
 function linkEmTexto(texto: string, url: string): string {
   return texto.trim() === "" || texto === url ? url : `${texto} (${url})`;
@@ -232,10 +302,13 @@ export function formatarParaWhatsApp(entrada: string): { texto: string; detalhes
       let texto = pedaco;
       for (const regra of REGRAS_DE_FORMATACAO) {
         const antes = texto;
-        texto = typeof regra.troca === "string" ? texto.replace(regra.padrao, regra.troca) : texto.replace(regra.padrao, regra.troca);
+        texto =
+          typeof regra.troca === "string"
+            ? texto.replace(regra.padrao, regra.troca)
+            : texto.replace(regra.padrao, regra.troca);
         if (texto !== antes) detalhes.add(regra.detalhe);
       }
-      const semEntidades = texto.replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (e) => ENTIDADES[e]);
+      const semEntidades = texto.replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (e) => ENTIDADES[e] ?? e);
       if (semEntidades !== texto) detalhes.add("HTML removido");
       return semEntidades;
     })

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { Enviar, Mensagem } from "@caqui/nucleo";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { TextoWhatsApp } from "./formatacao";
 import * as Icone from "./icones";
-import { paraWhatsApp, type MensagemWhatsApp, type SecaoLista } from "./limites";
+import { type MensagemWhatsApp, paraWhatsApp, type SecaoLista } from "./limites";
 import { DATA_SIMULADA, HORAS_DA_DEMO, horaExibida, momentoISO, msDoMomento } from "./momento";
 import { PainelCortes, type Rodada } from "./PainelCortes";
 import estilos from "./Simulador.module.css";
@@ -16,9 +16,12 @@ const ESPERA_MINIMA_DIGITANDO_MS = 900;
 type Fase = "ocioso" | "entregue" | "digitando";
 type Relogio = { hora: string; base: number; desde: number };
 
-type Item =
+// `id` vem da posição no histórico, que só cresce: é estável entre renderizações.
+type Conteudo = { id: string } & (
   | { lado: "cliente"; texto: string; em: string; lida: boolean }
-  | { lado: "caqui"; mensagem: MensagemWhatsApp; em: string };
+  | { lado: "caqui"; mensagem: MensagemWhatsApp; em: string }
+);
+type Item = Conteudo & { comCauda: boolean };
 
 export function Simulador({ enviar }: { enviar: Enviar }) {
   const [historico, setHistorico] = useState<Mensagem[]>([]);
@@ -27,9 +30,10 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
   const [erro, setErro] = useState<string | null>(null);
   const [relogio, setRelogio] = useState<Relogio>(() => novoRelogio(HORAS_DA_DEMO[0]));
   const [, setPulso] = useState(0);
-  const [listaAberta, setListaAberta] = useState<{ botao: string; secoes: SecaoLista[] } | null>(null);
+  const [listaAberta, setListaAberta] = useState<{ botao: string; secoes: SecaoLista[] } | null>(
+    null,
+  );
   const [painelAberto, setPainelAberto] = useState(false);
-  const fimDaConversa = useRef<HTMLDivElement>(null);
 
   const agora = () => momentoISO(relogio.base + (Date.now() - relogio.desde));
 
@@ -42,9 +46,15 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
     if (window.matchMedia("(min-width: 900px)").matches) setPainelAberto(true);
   }, []);
 
+  const temLista = listaAberta !== null;
   useEffect(() => {
-    fimDaConversa.current?.scrollIntoView({ block: "end" });
-  }, [historico, fase]);
+    if (!temLista) return;
+    const fecharComEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setListaAberta(null);
+    };
+    document.addEventListener("keydown", fecharComEsc);
+    return () => document.removeEventListener("keydown", fecharComEsc);
+  }, [temLista]);
 
   const { itens, rodadas } = useMemo(() => montarConversa(historico, fase), [historico, fase]);
   const totalDeCortes = rodadas.reduce((n, r) => n + r.cortes.length, 0);
@@ -63,9 +73,15 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
     try {
       const [resposta] = await Promise.all([
         enviar({ canal: "whatsapp", mensagem, historico: anterior, idCliente: null, momento: em }),
-        new Promise((pronto) => setTimeout(pronto, ESPERA_ENTREGUE_MS + ESPERA_MINIMA_DIGITANDO_MS)),
+        new Promise((pronto) =>
+          setTimeout(pronto, ESPERA_ENTREGUE_MS + ESPERA_MINIMA_DIGITANDO_MS),
+        ),
       ]);
-      setHistorico([...anterior, { autor: "cliente", texto: mensagem, em }, { autor: "caqui", resposta, em: agora() }]);
+      setHistorico([
+        ...anterior,
+        { autor: "cliente", texto: mensagem, em },
+        { autor: "caqui", resposta, em: agora() },
+      ]);
     } catch {
       setHistorico(anterior);
       setRascunho(mensagem);
@@ -92,14 +108,15 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
       <aside className={estilos.lateral}>
         <h1 className={estilos.titulo}>Caqui no WhatsApp (simulador)</h1>
         <p className={estilos.subtitulo}>
-          O mesmo atendimento num canal fechado: só texto simples, até 3 botões e listas. O que não cabe é cortado ou adaptado.
+          O mesmo atendimento num canal fechado: só texto simples, até 3 botões e listas. O que não
+          cabe é cortado ou adaptado.
         </p>
 
         <fieldset className={estilos.momento}>
           <legend>Momento simulado</legend>
           <div className={estilos.momentoLinha}>
             <span className={estilos.momentoData}>qua, 18/11/2026</span>
-            <div className={estilos.segmentos} role="group" aria-label="Horário">
+            <fieldset className={estilos.segmentos} aria-label="Horário">
               {HORAS_DA_DEMO.map((hora) => (
                 <button
                   key={hora}
@@ -118,7 +135,7 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
                 value={relogio.hora}
                 onChange={(e) => escolherHora(e.target.value)}
               />
-            </div>
+            </fieldset>
           </div>
           <p className={estilos.momentoNota}>
             {foraDoHorarioHumano(relogio.hora)
@@ -127,10 +144,16 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
           </p>
         </fieldset>
 
-        <details className={estilos.painel} open={painelAberto} onToggle={(e) => setPainelAberto(e.currentTarget.open)}>
+        <details
+          className={estilos.painel}
+          open={painelAberto}
+          onToggle={(e) => setPainelAberto(e.currentTarget.open)}
+        >
           <summary>
             O que o canal cortou
-            <span className={totalDeCortes > 0 ? estilos.contadorAtivo : estilos.contador}>{totalDeCortes}</span>
+            <span className={totalDeCortes > 0 ? estilos.contadorAtivo : estilos.contador}>
+              {totalDeCortes}
+            </span>
           </summary>
           <div className={estilos.painelCorpo}>
             <PainelCortes rodadas={rodadas} />
@@ -170,14 +193,14 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
               <span>Hoje</span>
             </div>
             <div className={estilos.avisoCanal}>
-              <Icone.Cadeado /> Esta é uma conta comercial. Esta conversa é um simulador com dados fictícios.
+              <Icone.Cadeado /> Esta é uma conta comercial. Esta conversa é um simulador com dados
+              fictícios.
             </div>
 
-            {itens.map((item, i) => (
+            {itens.map((item) => (
               <Bolha
-                key={i}
+                key={item.id}
                 item={item}
-                comCauda={i === 0 || ladoDe(itens[i - 1]) !== ladoDe(item)}
                 desativado={ocupado}
                 aoEscolher={mandar}
                 aoAbrirLista={setListaAberta}
@@ -186,7 +209,7 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
 
             {fase === "digitando" && (
               <div className={`${estilos.linhaCaqui} ${estilos.comCauda}`}>
-                <div className={`${estilos.bolhaCaqui} ${estilos.digitando}`} aria-label="Caqui Invest está digitando">
+                <div className={`${estilos.bolhaCaqui} ${estilos.digitando}`} aria-hidden>
                   <i />
                   <i />
                   <i />
@@ -194,7 +217,8 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
               </div>
             )}
             {erro && <div className={estilos.erro}>{erro}</div>}
-            <div ref={fimDaConversa} />
+            {/* Remonta a cada mensagem ou mudança de fase e rola a conversa até o fim. */}
+            <div key={`${itens.length}-${fase}`} ref={rolarAteAqui} />
           </div>
 
           <form className={estilos.compositor} onSubmit={aoEnviar}>
@@ -205,22 +229,44 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
               value={rascunho}
               onChange={(e) => setRascunho(e.target.value)}
             />
-            <button className={estilos.botaoEnviar} type="submit" disabled={ocupado || rascunho.trim() === ""} aria-label="Enviar">
+            <button
+              className={estilos.botaoEnviar}
+              type="submit"
+              disabled={ocupado || rascunho.trim() === ""}
+              aria-label="Enviar"
+            >
               <Icone.Enviar />
             </button>
           </form>
 
           {listaAberta && (
-            <div className={estilos.vela} onClick={() => setListaAberta(null)}>
-              <div className={estilos.folha} role="dialog" aria-label={listaAberta.botao} onClick={(e) => e.stopPropagation()}>
+            <div className={estilos.vela}>
+              <button
+                type="button"
+                className={estilos.velaFundo}
+                aria-label="Fechar lista"
+                tabIndex={-1}
+                onClick={() => setListaAberta(null)}
+              />
+              <div
+                className={estilos.folha}
+                role="dialog"
+                aria-modal
+                aria-label={listaAberta.botao}
+              >
                 <div className={estilos.folhaTopo}>
-                  <button type="button" className={estilos.fecharFolha} onClick={() => setListaAberta(null)} aria-label="Fechar">
+                  <button
+                    type="button"
+                    className={estilos.fecharFolha}
+                    onClick={() => setListaAberta(null)}
+                    aria-label="Fechar"
+                  >
                     ×
                   </button>
                   <span>{listaAberta.botao}</span>
                 </div>
-                {listaAberta.secoes.map((secao, i) => (
-                  <section key={i}>
+                {listaAberta.secoes.map((secao) => (
+                  <section key={secao.linhas.map((l) => l.id).join()}>
                     {secao.titulo && <h3 className={estilos.secaoTitulo}>{secao.titulo}</h3>}
                     {secao.linhas.map((linha) => (
                       <button
@@ -231,7 +277,9 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
                         onClick={() => void mandar(linha.titulo)}
                       >
                         <span className={estilos.linhaTitulo}>{linha.titulo}</span>
-                        {linha.descricao && <span className={estilos.linhaDescricao}>{linha.descricao}</span>}
+                        {linha.descricao && (
+                          <span className={estilos.linhaDescricao}>{linha.descricao}</span>
+                        )}
                         <span className={estilos.radio} aria-hidden />
                       </button>
                     ))}
@@ -246,20 +294,22 @@ export function Simulador({ enviar }: { enviar: Enviar }) {
   );
 }
 
+function rolarAteAqui(fim: HTMLDivElement | null) {
+  fim?.scrollIntoView({ block: "end" });
+}
+
 function Bolha({
   item,
-  comCauda,
   desativado,
   aoEscolher,
   aoAbrirLista,
 }: {
   item: Item;
-  comCauda: boolean;
   desativado: boolean;
   aoEscolher: (texto: string) => void;
   aoAbrirLista: (lista: { botao: string; secoes: SecaoLista[] }) => void;
 }) {
-  const cauda = comCauda ? estilos.comCauda : "";
+  const cauda = item.comCauda ? estilos.comCauda : "";
   if (item.lado === "cliente") {
     return (
       <div className={`${estilos.linhaCliente} ${cauda}`}>
@@ -339,27 +389,38 @@ function montarConversa(historico: Mensagem[], fase: Fase): { itens: Item[]; rod
   const itens: Item[] = [];
   const rodadas: Rodada[] = [];
   let pergunta = "";
+  let ladoAnterior: string | null = null;
+  const adicionar = (item: Conteudo) => {
+    const lado = item.lado === "caqui" && item.mensagem.tipo === "sistema" ? "sistema" : item.lado;
+    itens.push({ ...item, comCauda: lado !== ladoAnterior });
+    ladoAnterior = lado;
+  };
   historico.forEach((mensagem, i) => {
     if (mensagem.autor === "cliente") {
       pergunta = mensagem.texto;
       const ultima = i === historico.length - 1;
-      itens.push({ lado: "cliente", texto: mensagem.texto, em: mensagem.em, lida: !(ultima && fase === "entregue") });
+      adicionar({
+        id: `${i}`,
+        lado: "cliente",
+        texto: mensagem.texto,
+        em: mensagem.em,
+        lida: !(ultima && fase === "entregue"),
+      });
       return;
     }
     const mensagens = paraWhatsApp(mensagem.resposta);
-    for (const m of mensagens) itens.push({ lado: "caqui", mensagem: m, em: mensagem.em });
+    mensagens.forEach((m, j) => {
+      adicionar({ id: `${i}.${j}`, lado: "caqui", mensagem: m, em: mensagem.em });
+    });
     rodadas.push({
+      id: `${i}`,
       pergunta,
       motivo: mensagem.resposta.motivo,
       hora: horaExibida(mensagem.em),
-      cortes: mensagens.flatMap((m) => m.cortes),
+      cortes: mensagens.flatMap((m, j) => m.cortes.map((corte, k) => ({ id: `${j}.${k}`, corte }))),
     });
   });
   return { itens, rodadas };
-}
-
-function ladoDe(item: Item): string {
-  return item.lado === "caqui" && item.mensagem.tipo === "sistema" ? "sistema" : item.lado;
 }
 
 function novoRelogio(hora: string): Relogio {
