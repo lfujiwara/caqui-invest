@@ -16,6 +16,36 @@ Não há trilha, formato esperado nem resposta certa. O grupo lê os dados, esco
 4. Antes de qualquer código, preencha o [SPEC.md](templates/SPEC.md) com as respostas às seis perguntas.
 5. Construa, verifique e publique.
 
+## Como rodar
+
+Precisa de Node 22 e do pnpm via corepack (`corepack enable`). O modo padrão é `offline`: sem rede e determinístico.
+
+```bash
+pnpm install
+pnpm dev        # http://localhost:3000 (web) e /whatsapp
+pnpm check      # biome, tsc por pacote e dependency-cruiser
+pnpm test       # vitest
+pnpm eval       # perguntas_teste.jsonl pelo harness + checar_respostas.py
+pnpm eval --url http://localhost:3000   # o mesmo, pela API publicada
+pnpm build && pnpm start
+```
+
+Para usar um modelo de verdade, copie `.env.example` para `.env` e troque `CAQUI_MODELO_ROTEADOR` e `CAQUI_MODELO_MOTIVO` para `ollama:<modelo>` ou `openrouter:<provedor>/<modelo>`.
+
+```bash
+docker compose up --build                      # só o app, em http://localhost:3000
+docker compose --profile ollama up --build     # app + ollama
+```
+
+O código fica assim. O app depende de `motivos`, que depende de `nucleo`. Uma fatia nunca importa outra; o `pnpm check` falha se isso acontecer.
+
+```
+apps/caqui/          Next.js, o único deployável: páginas, server action e /api/chat
+packages/nucleo/     contrato zod, harness, roteador, guardrails, modelos, calendário, IR, KB
+packages/motivos/    uma pasta por motivo de contato, cada uma com index, skills, tools e teste
+ferramentas/         avaliar.ts (pnpm eval) e checar_respostas.py
+```
+
 ## O que tem aqui
 
 ```
