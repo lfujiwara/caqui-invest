@@ -1,0 +1,112 @@
+/*
+ * Tokens da Caqui Invest no canal web. Estrutura herdada do design.md de referência
+ * (uma única cor de ação, cinzas frios, pílulas para o que é clicável, cartões de 24px,
+ * uma só sombra, números em fonte mono). Tamanhos e contrastes foram aumentados para
+ * o público mais velho: texto-base 18px, alvos de toque de 48px ou mais, todo par de
+ * texto/fundo com contraste de 7:1 ou mais, exceto o texto sobre a cor de ação (5,8:1).
+ *
+ * Os tokens ficam escopados em .tema para não vazar para o resto da aplicação.
+ */
+
+.tema {
+  --cq-caqui: #b33d0b;
+  --cq-caqui-ativo: #9a3412;
+  --cq-caqui-suave: #fff4ee;
+  --cq-sobre-caqui: #ffffff;
+  --cq-folha: #2f7d4f;
+
+  --cq-tinta: #0a0b0d;
+  --cq-texto: #2b2f36;
+  --cq-texto-suave: #4b515c;
+  --cq-linha: #dee1e6;
+  --cq-linha-suave: #eef0f3;
+
+  --cq-fundo: #f7f7f7;
+  --cq-cartao: #ffffff;
+  --cq-superficie-forte: #eef0f3;
+
+  --cq-alerta: #b01c28;
+  --cq-alerta-fundo: #fdecee;
+  --cq-positivo: #067a48;
+
+  --cq-fonte: Inter, -apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --cq-fonte-mono: "JetBrains Mono", "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --cq-texto-display: 400 2rem/1.13 var(--cq-fonte);
+  --cq-texto-titulo: 600 1.25rem/1.33 var(--cq-fonte);
+  --cq-texto-titulo-p: 600 1.125rem/1.3 var(--cq-fonte);
+  --cq-texto-corpo: 400 1.125rem/1.55 var(--cq-fonte);
+  --cq-texto-corpo-p: 400 1rem/1.5 var(--cq-fonte);
+  --cq-texto-legenda: 600 0.9375rem/1.4 var(--cq-fonte);
+  --cq-texto-botao: 600 1.0625rem/1.15 var(--cq-fonte);
+  --cq-texto-numero: 500 1.0625rem/1.4 var(--cq-fonte-mono);
+
+  --cq-e-1: 4px;
+  --cq-e-2: 8px;
+  --cq-e-3: 12px;
+  --cq-e-4: 16px;
+  --cq-e-5: 20px;
+  --cq-e-6: 24px;
+  --cq-e-8: 32px;
+  --cq-e-12: 48px;
+
+  --cq-raio-sm: 8px;
+  --cq-raio-md: 12px;
+  --cq-raio-lg: 16px;
+  --cq-raio-xl: 24px;
+  --cq-raio-pilula: 100px;
+
+  --cq-sombra: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --cq-alvo: 52px;
+  --cq-foco: 0 0 0 3px var(--cq-cartao), 0 0 0 6px var(--cq-caqui);
+
+  color-scheme: light;
+  font: var(--cq-texto-corpo);
+  color: var(--cq-texto);
+  background: var(--cq-fundo);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tema:not([data-tema="claro"]) {
+    --cq-caqui: #ff8f57;
+    --cq-caqui-ativo: #f2763a;
+    --cq-caqui-suave: #2a1408;
+    --cq-sobre-caqui: #0a0b0d;
+    --cq-folha: #5fcf8c;
+    --cq-tinta: #f4f5f7;
+    --cq-texto: #e8eaed;
+    --cq-texto-suave: #a8acb3;
+    --cq-linha: #2c3036;
+    --cq-linha-suave: #1f2227;
+    --cq-fundo: #0a0b0d;
+    --cq-cartao: #16181c;
+    --cq-superficie-forte: #23262b;
+    --cq-alerta: #ff6b74;
+    --cq-alerta-fundo: #2a0c10;
+    --cq-positivo: #3ddc97;
+    --cq-sombra: 0 4px 12px rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
+  }
+}
+
+.tema[data-tema="escuro"] {
+  --cq-caqui: #ff8f57;
+  --cq-caqui-ativo: #f2763a;
+  --cq-caqui-suave: #2a1408;
+  --cq-sobre-caqui: #0a0b0d;
+  --cq-folha: #5fcf8c;
+  --cq-tinta: #f4f5f7;
+  --cq-texto: #e8eaed;
+  --cq-texto-suave: #a8acb3;
+  --cq-linha: #2c3036;
+  --cq-linha-suave: #1f2227;
+  --cq-fundo: #0a0b0d;
+  --cq-cartao: #16181c;
+  --cq-superficie-forte: #23262b;
+  --cq-alerta: #ff6b74;
+  --cq-alerta-fundo: #2a0c10;
+  --cq-positivo: #3ddc97;
+  --cq-sombra: 0 4px 12px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}

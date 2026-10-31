@@ -1,0 +1,302 @@
+.painel {
+  display: grid;
+  gap: var(--cq-e-4);
+}
+
+.cartao {
+  background: var(--cq-cartao);
+  border: 1px solid var(--cq-linha);
+  border-radius: var(--cq-raio-xl);
+  padding: var(--cq-e-5);
+  color: var(--cq-texto);
+}
+
+@media (min-width: 640px) {
+  .cartao {
+    padding: var(--cq-e-6);
+  }
+}
+
+.titulo {
+  margin: 0 0 var(--cq-e-4);
+  font: var(--cq-texto-titulo);
+  color: var(--cq-tinta);
+}
+
+.subtitulo {
+  margin: calc(-1 * var(--cq-e-2)) 0 var(--cq-e-4);
+  color: var(--cq-texto-suave);
+}
+
+.nota {
+  margin: var(--cq-e-4) 0 0;
+  padding-top: var(--cq-e-3);
+  border-top: 1px solid var(--cq-linha-suave);
+  font: var(--cq-texto-corpo-p);
+  color: var(--cq-texto-suave);
+}
+
+.numero {
+  font: var(--cq-texto-numero);
+  font-variant-numeric: tabular-nums;
+}
+
+.rotuloPequeno {
+  margin: 0;
+  font: var(--cq-texto-legenda);
+  color: var(--cq-texto-suave);
+}
+
+/* Timeline */
+
+.etapas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.etapa {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: var(--cq-e-3);
+  padding-bottom: var(--cq-e-5);
+}
+
+.etapa:last-child {
+  padding-bottom: 0;
+}
+
+.etapa:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  bottom: 0;
+  width: 2px;
+  background: var(--cq-linha);
+}
+
+.etapa[data-estado="concluida"]:not(:last-child)::before {
+  background: var(--cq-caqui);
+}
+
+.marcador {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 2px solid var(--cq-linha);
+  background: var(--cq-cartao);
+  box-sizing: border-box;
+}
+
+.etapa[data-estado="concluida"] .marcador {
+  background: var(--cq-caqui);
+  border-color: var(--cq-caqui);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E");
+  background-size: 18px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.etapa[data-estado="atual"] .marcador {
+  border: 7px solid var(--cq-caqui);
+}
+
+.etapaRotulo {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--cq-e-2);
+  font: var(--cq-texto-titulo-p);
+  color: var(--cq-tinta);
+}
+
+.etapaEstado {
+  font: var(--cq-texto-legenda);
+  color: var(--cq-texto-suave);
+}
+
+.etapa[data-estado="atual"] .etapaEstado {
+  color: var(--cq-caqui);
+}
+
+.etapaQuando {
+  margin: 2px 0 0;
+  font: var(--cq-texto-numero);
+  color: var(--cq-texto);
+}
+
+.etapaDetalhe {
+  margin: var(--cq-e-1) 0 0;
+  font: var(--cq-texto-corpo-p);
+  color: var(--cq-texto-suave);
+}
+
+/* Comparativo */
+
+.comparados {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--cq-e-5);
+}
+
+@media (min-width: 640px) {
+  .comparados {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.comparadoProduto {
+  margin: 0 0 var(--cq-e-2);
+  font: var(--cq-texto-titulo-p);
+  color: var(--cq-tinta);
+}
+
+.barra {
+  height: 10px;
+  border-radius: var(--cq-raio-pilula);
+  background: var(--cq-superficie-forte);
+  overflow: hidden;
+  margin-bottom: var(--cq-e-3);
+}
+
+.barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cq-caqui);
+}
+
+.valores {
+  margin: 0;
+  display: grid;
+  gap: var(--cq-e-1);
+}
+
+.valores div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--cq-e-3);
+}
+
+.valores dt {
+  color: var(--cq-texto-suave);
+  font: var(--cq-texto-corpo-p);
+}
+
+.valores dd {
+  margin: 0;
+  color: var(--cq-texto);
+}
+
+.liquido {
+  padding-top: var(--cq-e-2);
+  margin-top: var(--cq-e-1);
+  border-top: 1px solid var(--cq-linha-suave);
+}
+
+.liquido dt {
+  color: var(--cq-tinta);
+  font: var(--cq-texto-titulo-p);
+}
+
+.liquido dd {
+  color: var(--cq-tinta);
+  font-weight: 700;
+}
+
+/* Protocolo */
+
+.protocolo {
+  margin: 2px 0 var(--cq-e-4);
+  font: 500 1.5rem/1.2 var(--cq-fonte-mono);
+  letter-spacing: 0.02em;
+  color: var(--cq-tinta);
+  overflow-wrap: anywhere;
+}
+
+.ficha {
+  margin: 0;
+  display: grid;
+  gap: var(--cq-e-2);
+}
+
+.ficha div {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: var(--cq-e-3);
+}
+
+.ficha dt {
+  color: var(--cq-texto-suave);
+}
+
+.ficha dd {
+  margin: 0;
+  color: var(--cq-tinta);
+}
+
+/* Tabela de IR */
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela th,
+.tabela td {
+  text-align: left;
+  padding: var(--cq-e-3) var(--cq-e-2);
+  border-bottom: 1px solid var(--cq-linha-suave);
+  vertical-align: middle;
+}
+
+.tabela thead th {
+  font: var(--cq-texto-legenda);
+  color: var(--cq-texto-suave);
+  border-bottom-color: var(--cq-linha);
+}
+
+.tabela tbody th {
+  font-weight: 400;
+  color: var(--cq-texto);
+}
+
+.tabela td {
+  text-align: right;
+  color: var(--cq-tinta);
+}
+
+.tabela thead th:last-child {
+  text-align: right;
+}
+
+.tabela tr[data-atual] th,
+.tabela tr[data-atual] td {
+  background: var(--cq-caqui-suave);
+  color: var(--cq-tinta);
+  font-weight: 600;
+}
+
+.tabela tr[data-atual] th:first-child {
+  border-radius: var(--cq-raio-md) 0 0 var(--cq-raio-md);
+}
+
+.tabela tr[data-atual] td:last-child {
+  border-radius: 0 var(--cq-raio-md) var(--cq-raio-md) 0;
+}
+
+.selo {
+  display: inline-block;
+  margin-left: var(--cq-e-2);
+  padding: 2px 10px;
+  border-radius: var(--cq-raio-pilula);
+  background: var(--cq-caqui);
+  color: var(--cq-sobre-caqui);
+  font: var(--cq-texto-legenda);
+  white-space: nowrap;
+}
