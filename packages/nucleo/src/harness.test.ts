@@ -1,7 +1,8 @@
 import { tool } from "ai";
+import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { rodarAgente } from "./agente";
+import { rodarAgente, TOOL_DA_RESPOSTA } from "./agente";
 import { encaminhar } from "./atendimento";
 import { type ChatRequest, MotivoId, type Resposta } from "./contrato";
 import { atender } from "./harness";
@@ -243,5 +244,47 @@ describe("modelos", () => {
     });
     expect(resposta.fontes).toEqual([fonteKb("KB-004")]);
     expect(resposta.texto).toContain("Liquidez diária");
+  });
+
+  it("consulta a conta antes de responder, sem forçar JSON em nenhum passo", async () => {
+    let passo = 0;
+    const proximaChamada = () =>
+      passo++ === 0
+        ? { toolName: "consultar", input: "{}" }
+        : {
+            toolName: TOOL_DA_RESPOSTA,
+            input: JSON.stringify({ texto: "Seu resgate cai hoje.", kbs: [] }),
+          };
+    const modelo = new MockLanguageModelV4({
+      doGenerate: async () => ({
+        content: [{ type: "tool-call", toolCallId: "1", ...proximaChamada() }],
+        finishReason: { unified: "tool-calls", raw: undefined },
+        usage: {
+          inputTokens: { total: 0, noCache: 0, cacheRead: undefined, cacheWrite: undefined },
+          outputTokens: { total: 0, text: 0, reasoning: undefined },
+        },
+        warnings: [],
+      }),
+    });
+    const resposta = await rodarAgente({
+      motivo: "onde_esta_meu_dinheiro",
+      skill: "",
+      kbs: [],
+      tools: {
+        consultar: tool({
+          description: "lê a conta",
+          inputSchema: z.object({}),
+          execute: async () => ({ fonte: "Suas operações na Caqui" }),
+        }),
+      },
+      req: req("Cadê meu resgate?"),
+      modelo,
+    });
+    expect(resposta.texto).toBe("Seu resgate cai hoje.");
+    expect(resposta.fontes).toEqual([{ tipo: "conta", descricao: "Suas operações na Caqui" }]);
+    expect(modelo.doGenerateCalls.map((c) => c.responseFormat?.type ?? "texto")).toEqual([
+      "texto",
+      "texto",
+    ]);
   });
 });

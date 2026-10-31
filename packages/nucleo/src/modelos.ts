@@ -2,7 +2,7 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import type { LanguageModel } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
-import type { SaidaAgente } from "./agente";
+import { type SaidaAgente, TOOL_DA_RESPOSTA } from "./agente";
 import { buscarKb } from "./kb";
 
 /**
@@ -65,8 +65,15 @@ function modeloOffline(kbs: readonly string[]): LanguageModel {
             kbs: [],
           };
       return {
-        content: [{ type: "text", text: JSON.stringify(saida) }],
-        finishReason: { unified: "stop", raw: undefined },
+        content: [
+          {
+            type: "tool-call",
+            toolCallId: "offline",
+            toolName: TOOL_DA_RESPOSTA,
+            input: JSON.stringify(saida),
+          },
+        ],
+        finishReason: { unified: "tool-calls", raw: undefined },
         usage: {
           inputTokens: { total: 0, noCache: 0, cacheRead: undefined, cacheWrite: undefined },
           outputTokens: { total: 0, text: 0, reasoning: undefined },
