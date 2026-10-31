@@ -29,11 +29,31 @@ function listarDoRepo(pasta: string): string[] {
   return readdirSync(join(/*turbopackIgnore: true*/ raiz, pasta));
 }
 
+// Campo entre aspas pode ter vírgula e "" escapado (conversas.csv). Não trata quebra de linha
+// dentro do campo: nenhum arquivo do pacote tem.
+function separarLinhaCsv(linha: string): string[] {
+  const campos: string[] = [];
+  let campo = "";
+  let aspas = false;
+  for (let i = 0; i < linha.length; i++) {
+    const c = linha[i];
+    if (c === '"' && aspas && linha[i + 1] === '"') {
+      campo += '"';
+      i++;
+    } else if (c === '"') aspas = !aspas;
+    else if (c === "," && !aspas) {
+      campos.push(campo);
+      campo = "";
+    } else campo += c;
+  }
+  return [...campos, campo];
+}
+
 function lerCsv(caminho: string): Record<string, string>[] {
   const [cabecalho, ...linhas] = lerDoRepo(caminho).trim().split(/\r?\n/);
-  const campos = (cabecalho ?? "").split(",");
+  const campos = separarLinhaCsv(cabecalho ?? "");
   return linhas.map((linha) => {
-    const valores = linha.split(",");
+    const valores = separarLinhaCsv(linha);
     return Object.fromEntries(campos.map((campo, i) => [campo, valores[i] ?? ""]));
   });
 }
@@ -115,6 +135,28 @@ const OperacaoBruta = z
   }));
 export type Operacao = z.output<typeof OperacaoBruta>;
 
+const ConversaBruta = z
+  .object({
+    id_conversa: z.string(),
+    id_cliente: z.string(),
+    canal: z.string(),
+    inicio: z.string(),
+    motivo: z.string(),
+    desfecho: z.string(),
+    transcricao: z.string(),
+  })
+  .transform((c) => ({
+    id: c.id_conversa,
+    idCliente: c.id_cliente,
+    canal: c.canal,
+    inicio: c.inicio,
+    motivo: c.motivo,
+    desfecho: c.desfecho,
+    turnos: c.transcricao.split(" | "),
+  }));
+/** Atendimento anterior. Ficam de fora os rótulos internos (risco, sinais, não conformidade). */
+export type Conversa = z.output<typeof ConversaBruta>;
+
 const Calendario = z.object({
   horario_corte: z.string().regex(/^\d{2}:\d{2}$/),
   dias: z.array(
@@ -152,6 +194,7 @@ const lerJson = (caminho: string): unknown => JSON.parse(lerDoRepo(caminho));
 export const clientes = memo(() => z.array(ClienteBruto).parse(lerJson("dados/clientes.json")));
 export const posicoes = memo(() => z.array(PosicaoBruta).parse(lerCsv("dados/posicoes.csv")));
 export const operacoes = memo(() => z.array(OperacaoBruta).parse(lerCsv("dados/operacoes.csv")));
+export const conversas = memo(() => z.array(ConversaBruta).parse(lerCsv("dados/conversas.csv")));
 export const taxas = memo(() => Taxas.parse(lerJson("dados/taxas.json")));
 export const calendario = memo(() => {
   const c = Calendario.parse(lerJson("dados/calendario.json"));

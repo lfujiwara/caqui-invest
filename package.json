@@ -12,7 +12,8 @@
     "start": "pnpm --filter caqui start",
     "check": "biome check . && pnpm -r --if-present typecheck && depcruise . --config .dependency-cruiser.cjs",
     "test": "vitest run",
-    "eval": "pnpm --filter @caqui/ferramentas avaliar"
+    "eval": "pnpm --filter @caqui/ferramentas avaliar",
+    "conversar": "pnpm --filter @caqui/ferramentas conversar"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.4",

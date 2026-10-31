@@ -4,11 +4,13 @@
   "type": "module",
   "scripts": {
     "avaliar": "tsx avaliar.ts",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "conversar": "node --import tsx conversar.ts"
   },
   "dependencies": {
     "@caqui/motivos": "workspace:*",
-    "@caqui/nucleo": "workspace:*"
+    "@caqui/nucleo": "workspace:*",
+    "ai": "7.0.159"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
